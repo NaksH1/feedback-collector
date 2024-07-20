@@ -1,0 +1,58 @@
+### Feedback Collector: 
+
+## Description
+
+1. Program Coordinator should be able to signup
+2. PC should be able to create events
+  1. Events has a title, date, organiser_name and list of volunteers.
+3. PC must be able to edit the Events added.
+4. PC should be able to add volunteers to the created events.
+  1. Volunteer has a name, mobile no. and list of feedbacks
+5. PC must be able to add feedbakcs for any volunteer
+6. Admin should be able to signup  
+7. Admin should be able to view the created events
+8. Admin should be able to view the list of volunteers  
+
+##Routes
+
+#Admin routes:
+
+- POST /admin/signup
+   Description: Creates a new admin account.
+   Input: { username: 'admin', password: 'pass' }
+   Output: { message: 'Admin created successfully', token: 'jwt_token_here' }
+
+- POST /admin/login
+   Description: Authenticates an admin. It requires the admin to send username and password in the headers.
+   Input: Headers: { 'username': 'admin', 'password': 'pass' }
+   Output: { message: 'Logged in successfully', token: 'jwt_token_here' }
+
+## Program Coordinator routes: 
+
+- POST /user/signup
+   Description: Creates a new user account.
+   Input: { username: 'user', password: 'pass' }
+   Output: { message: 'User created successfully', token: 'jwt_token_here' }
+
+- POST /user/login
+   Description: Authenticates a user. It requires the user to send username and password in the headers.
+   Input: Headers: { 'username': 'user', 'password': 'pass' }
+   Output: { message: 'Logged in successfully', token: 'jwt_token_here' }
+
+- GET /user/events
+  Description: List of all the events created by the user
+  Input: Headers: { 'Authorization': 'Bearer jwt_token_here' }
+  Output: { events: [ {  }, ... ] } 
+
+- POST /user/events
+  Description: Create an event 
+  Input: Header: { 'Authorization' : 'Bearer jwt_token_here' }, Body: { }
+  Output: { message : 'Event Created', eventId: 1}
+
+- PUT /user/events/:eventId
+  Description: Edit an event's details
+  Input: Header: {'Autherization' : 'Bearer jwt_token_here' }, Body: { }
+  Output: {message : 'Event Updated', event}
+
+- POST /user/volunteer 
+  Description: Add L
