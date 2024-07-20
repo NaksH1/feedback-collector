@@ -3,15 +3,14 @@
 ## Description
 
 1. Program Coordinator should be able to signup
-2. PC should be able to create events
+2. admin should be able to create events
   1. Events has a title, date, organiser_name and list of volunteers.
-3. PC must be able to edit the Events added.
-4. PC should be able to add volunteers to the created events.
+3. PC should be able to add feedbacks for the volunteers present in the program.  
   1. Volunteer has a name, mobile no. and list of feedbacks
-5. PC must be able to add feedbakcs for any volunteer
-6. Admin should be able to signup  
-7. Admin should be able to view the created events
-8. Admin should be able to view the list of volunteers  
+4. PC must be able to add feedbakcs for any volunteer
+5. Admin should be able to signup  
+6. Admin should be able to view the created events
+7. Admin should be able to view the list of volunteers  
 
 ##Routes
 
@@ -27,6 +26,22 @@
    Input: Headers: { 'username': 'admin', 'password': 'pass' }
    Output: { message: 'Logged in successfully', token: 'jwt_token_here' }
 
+- GET /events
+  Description: List of all the events created by the admin
+  Input: Headers: { 'Authorization': 'Bearer jwt_token_here' }
+  Output: { events: [ {  }, ... ] } 
+
+- POST /events
+  Description: Create an event 
+  Input: Header: { 'Authorization' : 'Bearer jwt_token_here' }, Body: { }
+  Output: { message : 'Event Created', eventId: 1}
+
+- PUT /events/:eventId
+  Description: Edit an event's details
+  Input: Header: {'Autherization' : 'Bearer jwt_token_here' }, Body: { }
+  Output: {message : 'Event Updated', event}
+
+
 ## Program Coordinator routes: 
 
 - POST /user/signup
@@ -39,20 +54,7 @@
    Input: Headers: { 'username': 'user', 'password': 'pass' }
    Output: { message: 'Logged in successfully', token: 'jwt_token_here' }
 
-- GET /user/events
-  Description: List of all the events created by the user
-  Input: Headers: { 'Authorization': 'Bearer jwt_token_here' }
-  Output: { events: [ {  }, ... ] } 
-
-- POST /user/events
-  Description: Create an event 
-  Input: Header: { 'Authorization' : 'Bearer jwt_token_here' }, Body: { }
-  Output: { message : 'Event Created', eventId: 1}
-
-- PUT /user/events/:eventId
-  Description: Edit an event's details
-  Input: Header: {'Autherization' : 'Bearer jwt_token_here' }, Body: { }
-  Output: {message : 'Event Updated', event}
-
-- POST /user/volunteer 
-  Description: Add L
+- POST /volunteer 
+  Description: Add a volunteer if not alredy existing in  the DB
+  Input: Headers: {'Authorization' : 'Bearer jwt_token'}, Body: {Volunteer schema}
+  Output: 
