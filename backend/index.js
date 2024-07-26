@@ -5,7 +5,9 @@ const userRoutes = require('./src/routes/userRoutes.js');
 const eventRoutes = require('./src/routes/eventRoutes.js');
 const volunteerRoutes = require('./src/routes/volunteerRoutes.js');
 const feedbackRoutes = require('./src/routes/feedbackRoutes.js');
+const cors = require('cors');
 
+app.use(cors());
 app.use(express.json());
 
 const port = 3000;

@@ -3,11 +3,15 @@ const router = express.Router();
 const model = require('../model/dbModel');
 const Admin = model.Admin;
 const jwt = require('jsonwebtoken');
+const authenticateJwt = require('../middlewares/authentication.js');
+
+
 const secret = 'S@cr$t';
 
 router.post('/signup', async (req, res, next) => {
   // logic to sign up admin
   try {
+    console.log(req.body);
     const { username, password } = req.body;
     const existAdmin = await Admin.findOne({ username });
     if (existAdmin) {
@@ -44,5 +48,16 @@ router.post('/login', async (req, res, next) => {
     next(err);
   }
 });
+
+router.get('/me', authenticateJwt, async (req, res, next) => {
+  try {
+    res.json({
+      username: req.user.username
+    });
+  }
+  catch (error) {
+    next(error);
+  }
+})
 
 module.exports = router;
