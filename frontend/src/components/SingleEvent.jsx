@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Events } from "./Event";
-import { Grid, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import UpdateCard from "./UpdateEvent";
 import VolunteerTable from "./VolunteerTable";
 
@@ -35,7 +35,7 @@ function SingleEvent() {
             : "Loading.."}
         </Grid>
         <Grid item lg={12} md={12} sm={12}>
-          <VolunteerTable />
+          <VolunteerTable event={events} />
         </Grid>
       </Grid>
     </>

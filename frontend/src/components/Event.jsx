@@ -87,7 +87,7 @@ function Event() {
       </Stack>
       <Stack direction="row" spacing={2} sx={{ marginTop: 2, display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
         {events.map((event) => {
-          return <Events event={event} />
+          return <Events event={event} key={event._id} />
         })}
       </Stack>
     </>

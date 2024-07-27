@@ -5,6 +5,7 @@ import Login from './components/Login.jsx';
 import Event from './components/Event.jsx';
 import SingleEvent from './components/SingleEvent.jsx';
 import { AuthProvider } from './api/AuthContext.jsx';
+import AddFeedback from './components/AddFeedback.jsx';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/admin/login" element={<Login />} />
             <Route path="/events" element={<Event />} />
             <Route path="/events/:eventId" element={<SingleEvent />} />
+            <Route path="/addfeedback" element={<AddFeedback />} />
           </Routes>
         </AuthProvider>
       </div>

@@ -29,7 +29,8 @@ const volunteerSchema = new mongoose.Schema({
   name: String,
   mobileNumber: String,
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedbacks' }]
+  feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }],
+  events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Volunteer' }]
 });
 
 const feedbackSchema = new mongoose.Schema({

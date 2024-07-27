@@ -11,7 +11,7 @@ router.post('/', authenticateJwt, async (req, res) => {
     res.status(403).json({ message: "Volunteer already exists" });
   }
   else {
-    const newVolunteer = new Volunteer({ ...req.body, createdBy: req.user.id, feedbacks: [] });
+    const newVolunteer = new Volunteer({ ...req.body, createdBy: req.user.id, feedbacks: [], events: [] });
     await newVolunteer.save();
     res.status(200).json({ message: "Volunteer created" });
   }

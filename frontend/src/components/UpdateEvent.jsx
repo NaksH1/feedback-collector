@@ -12,7 +12,7 @@ function UpdateCard(prop) {
     setDate(prop.event.date);
     setProgramCoordinator(prop.event.programCoordinator);
   }, [prop.event]);
-  console.log(name, date, programCoordinator);
+
   const programName = [
     {
       value: 'Bhava Spandana',
