@@ -37,7 +37,7 @@ function UpdateCard(prop) {
     }));
     axios({
       method: "put",
-      url: 'http://localhost:3000/admin/courses/' + prop.event.id,
+      url: 'http://localhost:3000/event/' + prop.event._id,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       },

@@ -18,10 +18,11 @@ const userSchema = new mongoose.Schema({
 
 const eventSchema = new mongoose.Schema({
   name: String,
-  date: Date,
+  date: String,
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
   programCoordinators: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  published: Boolean
+  published: Boolean,
+  image: String
 });
 
 const volunteerSchema = new mongoose.Schema({

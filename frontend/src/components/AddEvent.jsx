@@ -64,7 +64,7 @@ function AddEvent({ name, setName, date, setDate, programCoordinator, setProgram
 export function postEvent(name, date, programCoordinator) {
   return axios({
     method: "post",
-    url: "http://localhost:3000/admin/courses",
+    url: "http://localhost:3000/event",
     headers: {
       "Authorization": "Bearer " + localStorage.getItem("token")
     },

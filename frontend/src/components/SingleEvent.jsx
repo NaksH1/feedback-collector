@@ -14,12 +14,12 @@ function SingleEvent() {
   useEffect(() => {
     axios({
       method: "get",
-      url: `http://localhost:3000/admin/courses/${eventId}`,
+      url: `http://localhost:3000/event/${eventId}`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }
     }).then((res) => {
-      setEvents(res.data.course);
+      setEvents(res.data.event);
     })
   }, []);
   return (

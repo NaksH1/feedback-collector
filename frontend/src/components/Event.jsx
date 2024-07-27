@@ -15,13 +15,13 @@ function Event() {
   const fetchEvents = () => {
     axios({
       method: "get",
-      url: "http://localhost:3000/admin/courses",
+      url: "http://localhost:3000/event",
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }
     }).then((res) => {
       console.log(res.data);
-      setEvents(res.data.courses);
+      setEvents(res.data.events);
     }).catch((err) => {
       console.error(err);
     });
@@ -97,7 +97,7 @@ function Event() {
 export function Events(prop) {
   const navigate = useNavigate();
   function handleEventClick() {
-    navigate(`/events/${prop.event.id}`);
+    navigate(`/events/${prop.event._id}`);
   }
 
   return (
