@@ -2,11 +2,13 @@ const express = require('express');
 const router = express.Router();
 const model = require('../model/dbModel');
 const Event = model.Event;
+const Volunteer = model.Volunteer;
+const Feedback = model.Feedback;
 const authenticateJwt = require('../middlewares/authentication.js');
 
 router.post('/', authenticateJwt, async (req, res) => {
   try {
-    const event = new Event({ ...req.body, createdBy: req.user.id, published: true });
+    const event = new Event({ ...req.body, createdBy: req.user.id, published: true, volunteers: [] });
     if (event.name === 'Bhava Spandana')
       event.image = "https://static.sadhguru.org/d/46272/1650519638-website-thumbnail-yogameditation-bsp.jpg";
     else if (event.name === 'Shoonya Intensive')
@@ -52,6 +54,37 @@ router.put('/:eventId', authenticateJwt, async (req, res) => {
   }
   else
     res.status(404).json({ message: "Event not found" });
+});
+
+router.post('/addVolunteer', authenticateJwt, async (req, res) => {
+  const { name, mobileNumber, type, eventId } = req.body;
+  let volunteer = await Volunteer.findOne({ mobileNumber: mobileNumber });
+  if (!volunteer) {
+    volunteer = new Volunteer({ name: name, mobileNumber: mobileNumber, type: type, createdBy: req.user.id, feedbacks: [] });
+    if (type === 'potential') {
+      const feedback = new Feedback({ eventId: eventId, volunteerId: volunteer._id, remark: req.body.remark, givenBy: req.user.id });
+      await feedback.save();
+      volunteer.feedbacks.push(feedback.id);
+    }
+    await volunteer.save();
+  }
+  const event = await Event.findById({ _id: eventId });
+  event.volunteers.push(volunteer._id);
+  await event.save();
+  res.status(201).json({ message: "Volunteer added to event", volunteer });
+});
+
+router.get('/getVolunteer/:eventId', authenticateJwt, async (req, res) => {
+  const eventId = req.params.eventId;
+  const event = await Event.findById({ _id: eventId });
+  if (event) {
+    await event.populate('volunteers');
+    const volunteers = event.volunteers;
+    res.json({ volunteers: volunteers })
+  }
+  else {
+    res.status(404).json({ message: "Event not found" });
+  }
 });
 
 module.exports = router;

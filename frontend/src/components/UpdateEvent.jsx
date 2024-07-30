@@ -28,7 +28,8 @@ function UpdateCard(prop) {
     }
   ];
 
-  function updateEvent() {
+  function updateEvent(event) {
+    event.preventDefault();
     prop.setEvent(preEvent => ({
       ...preEvent,
       name: name,

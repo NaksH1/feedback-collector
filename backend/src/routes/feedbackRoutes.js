@@ -34,8 +34,10 @@ router.get('/:volunteerId', authenticateJwt, async (req, res) => {
       eventDate: eventDate
     }
   }));
-  if (volunteer)
+  if (volunteer) {
+    console.log(feedbacks);
     res.json({ feedbacks: feedbacks || [] });
+  }
   else
     res.status(404).json({ message: "Volunteer not found" });
 });

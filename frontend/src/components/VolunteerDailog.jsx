@@ -53,7 +53,7 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
                 <Typography variant='body1'>
                   Feedbacks
                 </Typography>
-                <AddCircleOutlinedIcon fontSize="large" onClick={() => addFeedback()} />
+                {volunteer.type === 'training' ? <AddCircleOutlinedIcon fontSize="large" onClick={() => addFeedback()} /> : <></>}
               </Stack>
               <TableContainer component={Paper} sx={{ marginTop: 2 }}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">

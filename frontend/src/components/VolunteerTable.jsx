@@ -3,25 +3,31 @@ import { Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, Tabl
 import axios from "axios";
 import VolunteerDailog from "./VolunteerDailog";
 import AddIcon from '@mui/icons-material/Add';
+import AddVolunteer from "./AddVolunteer";
 
 function VolunteerTable({ event }) {
   const [volunteers, setVolunteers] = useState([]);
   const [volunteerDailog, setVolunteerDailog] = useState(false);
   const [selectedVolunteer, setSelectedVolunteer] = useState(null);
+  const [addVolunteer, setAddVolunteer] = useState(false);
   useEffect(() => {
-    axios({
-      method: "get",
-      url: `http://localhost:3000/volunteer`,
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("token")
-      }
-    }).then((res) => {
-      setVolunteers(res.data.volunteers);
-    });
-  }, []);
-  function addVolunteer() {
-    console.log("Volunteer added");
+    if (event && event._id) {
+      console.log(event._id);
+      axios({
+        method: "get",
+        url: `http://localhost:3000/event/getVolunteer/${event._id}`,
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("token")
+        }
+      }).then((res) => {
+        setVolunteers(res.data.volunteers);
+      });
+    }
+  }, [event]);
+  function handleSuccessfulVolunteerAdd(newVolunteer) {
+    setVolunteers((preVolunteers) => [...preVolunteers, newVolunteer]);
   }
+
   function openVolunteerDailog(volunteer) {
     setSelectedVolunteer(volunteer);
     setVolunteerDailog(true);
@@ -30,17 +36,24 @@ function VolunteerTable({ event }) {
     setVolunteerDailog(false);
     setSelectedVolunteer(null);
   }
+  function openAddVolunteer() {
+    setAddVolunteer(true);
+  }
+  function closeAddVolunteer() {
+    setAddVolunteer(false);
+  }
   return (
     <>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Typography variant="subtitle1">Volunteers</Typography>
-        <Button onClick={addVolunteer} variant="contained">Add</Button>
+        <Button variant="contained" onClick={() => openAddVolunteer()}>Add</Button>
       </Stack>
       <TableContainer component={Paper} sx={{ marginTop: 2 }}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
+              <TableCell align="right">Type</TableCell>
               <TableCell align="right">Mobile Number</TableCell>
               <TableCell align="right">Created By</TableCell>
             </TableRow>
@@ -54,6 +67,7 @@ function VolunteerTable({ event }) {
                 <TableCell component="th" scope="row">
                   {row.name}
                 </TableCell>
+                <TableCell align="right">{row.type === 'training' ? "Training Sahabhagi" : "Potential Sahabhagi"}</TableCell>
                 <TableCell align="right">{row.mobileNumber}</TableCell>
                 <TableCell align="right">{row.createdBy}</TableCell>
               </TableRow>
@@ -64,6 +78,7 @@ function VolunteerTable({ event }) {
       {selectedVolunteer && (
         <VolunteerDailog open={volunteerDailog} setOpen={closeVolunteerDailog} volunteer={selectedVolunteer} event={event} />
       )}
+      <AddVolunteer open={addVolunteer} close={closeAddVolunteer} eventId={event._id} onSuccess={handleSuccessfulVolunteerAdd} />
     </>
   )
 }

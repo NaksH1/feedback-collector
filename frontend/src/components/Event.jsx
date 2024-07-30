@@ -55,17 +55,6 @@ function Event() {
         <Dialog
           open={open}
           onClose={handleClose}
-          PaperProps={{
-            component: 'form',
-            onSubmit: (event) => {
-              event.preventDefault();
-              const formData = new FormData(event.currentTarget);
-              const formJson = Object.fromEntries(formData.entries());
-              const email = formJson.email;
-              console.log(email);
-              handleClose();
-            },
-          }}
         >
           <DialogTitle>Enter Event Details</DialogTitle>
           <DialogContent>

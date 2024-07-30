@@ -20,7 +20,8 @@ const eventSchema = new mongoose.Schema({
   name: String,
   date: String,
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
-  programCoordinators: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  programCoordinators: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  volunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Volunteer' }],
   published: Boolean,
   image: String
 });
@@ -29,13 +30,14 @@ const volunteerSchema = new mongoose.Schema({
   name: String,
   mobileNumber: String,
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }],
-  events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Volunteer' }]
+  type: { type: String, enum: ['potential', 'training'] },
+  feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }]
 });
 
 const feedbackSchema = new mongoose.Schema({
   eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' },
   volunteerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Volunteer' },
+  remark: String,
   feedback: String,
   givenBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
