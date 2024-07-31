@@ -34,6 +34,14 @@ router.get('/:volunteerId', authenticateJwt, async (req, res) => {
       eventDate: eventDate
     }
   }));
+  // const volunteer1 = await Volunteer.findById(req.params.volunteerId).populate({
+  //   path: 'feedbacks',
+  //   populate: [
+  //     { path: 'eventId', select: 'name' },
+  //     { path: 'givenBy', select: 'name' }
+  //   ]
+  // });
+  // console.log(volunteer1.eventId, volunteer1.givenBy);
   if (volunteer) {
     res.json({ feedbacks: feedbacks || [] });
   }

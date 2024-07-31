@@ -69,7 +69,7 @@ function VolunteerTable({ event }) {
                 </TableCell>
                 <TableCell align="right">{row.type === 'training' ? "Training Sahabhagi" : "Potential Sahabhagi"}</TableCell>
                 <TableCell align="right">{row.mobileNumber}</TableCell>
-                <TableCell align="right">{row.createdBy}</TableCell>
+                <TableCell align="right">{row.createdBy.name}</TableCell>
               </TableRow>
             ))}
           </TableBody>

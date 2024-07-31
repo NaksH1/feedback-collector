@@ -8,19 +8,20 @@ mongoose.connect('mongodb+srv://nakshsinghhh1:CNP2DaBXwJLf5ZYC@demo.vlottuc.mong
 const adminSchema = new mongoose.Schema({
   username: String,
   password: String,
+  name: String
 });
 
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
-  email: String
+  name: String
 });
 
 const eventSchema = new mongoose.Schema({
   name: String,
   date: String,
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
-  programCoordinators: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  programCoordinators: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
   volunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Volunteer' }],
   published: Boolean,
   image: String
@@ -29,7 +30,7 @@ const eventSchema = new mongoose.Schema({
 const volunteerSchema = new mongoose.Schema({
   name: String,
   mobileNumber: String,
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
   type: { type: String, enum: ['potential', 'training'] },
   feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }]
 });
@@ -52,7 +53,7 @@ const feedbackSchema = new mongoose.Schema({
     achoice5: { type: Boolean, default: false }, achoice6: { type: Boolean, default: false }
   },
   others: String, comment6: String, overall: String, remarks: String,
-  givenBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  givenBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' }
 });
 
 const Admin = mongoose.model('Admin', adminSchema);

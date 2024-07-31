@@ -5,7 +5,7 @@ import axios from "axios";
 
 function Appbar() {
   const navigate = useNavigate();
-  const [userEmail, setUserEmail] = useState(null);
+  const [userName, setUserName] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ function Appbar() {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }
     }).then((res) => {
-      setUserEmail(res.data.username);
+      setUserName(res.data.name);
       setIsLoggedIn(true);
     })
   }, [])
@@ -31,7 +31,7 @@ function Appbar() {
   function handleLogout() {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
-    setUserEmail(null);
+    setUserName(null);
     window.location = '/admin/login';
   }
   return (
@@ -44,7 +44,7 @@ function Appbar() {
         </Stack>
         {isLoggedIn ? (
           <Stack direction="row" alignItems="center">
-            <Typography sx={{ marginRight: 1 }}> {userEmail} </Typography>
+            <Typography sx={{ marginRight: 1 }}> {userName} </Typography>
             <Button variant="contained" onClick={handleLogout}>Logout</Button>
           </Stack>
         ) : (

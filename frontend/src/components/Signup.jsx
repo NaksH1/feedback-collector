@@ -6,7 +6,7 @@ import { useState } from "react";
 function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [name, setName] = useState("");
   const handleSignup = () => {
     axios({
       method: 'post',
@@ -15,6 +15,7 @@ function Signup() {
         'Content-Type': 'application/json'
       },
       data: {
+        name: name,
         username: email,
         password: password
       }
@@ -42,8 +43,16 @@ function Signup() {
         justifyContent: "center",
         flexDirection: "row"
       }}>
-        <Stack spacing={2}>
-          <Card variant={"outlined"} style={{ width: 400, padding: 20 }}>
+        <Card variant={"outlined"} style={{ width: 400, padding: 20 }}>
+          <Stack spacing={2}>
+            <TextField
+              onChange={(e) => {
+                setName(e.target.value);
+              }}
+              fullWidth={true}
+              id="outlined-basic"
+              label="Name"
+              variant={"outlined"} />
             <TextField
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -52,8 +61,6 @@ function Signup() {
               id="outlined-basic"
               label="Email"
               variant={"outlined"} />
-            <br />
-            <br />
             <TextField
               onChange={(e) => {
                 setPassword(e.target.value);
@@ -63,10 +70,10 @@ function Signup() {
               label="Password"
               variant={"outlined"}
               type={"password"} />
-            <br /><br />
             <Button size={"large"} variant="contained" onClick={handleSignup}>SIGNUP</Button>
-          </Card>
-        </Stack>
+          </Stack>
+        </Card>
+
       </div>
     </>
   )

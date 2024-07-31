@@ -11,18 +11,17 @@ const secret = 'S@cr$t';
 router.post('/signup', async (req, res, next) => {
   // logic to sign up admin
   try {
-    console.log(req.body);
-    const { username, password } = req.body;
+    const { username, password, name } = req.body;
     const existAdmin = await Admin.findOne({ username });
     if (existAdmin) {
       res.status(403).json({ message: "Admin already exists" });
     }
     else {
-      const newAdmin = new Admin({ username, password });
+      const newAdmin = new Admin({ username, password, name });
       await newAdmin.save();
-      const jwtToken = jwt.sign({ id: newAdmin.id, username: username, role: 'admin' }, secret, { expiresIn: '1hr' });
+      const token = jwt.sign({ id: newAdmin.id, name: name, role: 'admin' }, secret, { expiresIn: '1hr' });
 
-      res.status(201).json({ message: "Admin created", jwtToken });
+      res.status(201).json({ message: "Admin created", token });
     }
   }
   catch (error) {
@@ -38,7 +37,7 @@ router.post('/login', async (req, res, next) => {
     const { username, password } = req.headers;
     const admin = await Admin.findOne({ username, password });
     if (admin) {
-      const token = jwt.sign({ id: admin.id, username: username, role: 'admin' }, secret, { expiresIn: '1hr' });
+      const token = jwt.sign({ id: admin.id, name: admin.name, role: 'admin' }, secret, { expiresIn: '1hr' });
       res.json({ message: "Login successful", token });
     }
     else
@@ -50,9 +49,10 @@ router.post('/login', async (req, res, next) => {
 });
 
 router.get('/me', authenticateJwt, async (req, res, next) => {
+
   try {
     res.json({
-      username: req.user.username
+      name: req.user.name
     });
   }
   catch (error) {

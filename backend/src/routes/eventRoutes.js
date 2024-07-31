@@ -76,11 +76,12 @@ router.post('/addVolunteer', authenticateJwt, async (req, res) => {
 
 router.get('/getVolunteer/:eventId', authenticateJwt, async (req, res) => {
   const eventId = req.params.eventId;
-  const event = await Event.findById({ _id: eventId });
+  const event = await Event.findById(eventId).populate({
+    path: 'volunteers',
+    populate: { path: 'createdBy', select: 'name' }
+  });
   if (event) {
-    await event.populate('volunteers');
-    const volunteers = event.volunteers;
-    res.json({ volunteers: volunteers })
+    res.json({ volunteers: event.volunteers })
   }
   else {
     res.status(404).json({ message: "Event not found" });

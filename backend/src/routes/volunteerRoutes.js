@@ -26,8 +26,8 @@ router.put('/:volunteerId', authenticateJwt, async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-  const volunteer = await Volunteer.find({});
-  res.json({ volunteers: volunteer });
+  const volunteers = await Volunteer.find({}).populate('createdBy', 'name');
+  res.json({ volunteers: volunteers });
 });
 
 router.get('/:volunteerId', authenticateJwt, async (req, res) => {
