@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, Checkbox, Divider, FormControl, Radio, R
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import dayjs from "dayjs";
 
 const AREA_CHOICES = [
   "Hall set-up",
@@ -144,6 +145,11 @@ function AddFeedback() {
     console.log(resp);
     navigate(`/events/${event._id}`);
   }
+  const formatDate = (date) => {
+    if (!date)
+      return '';
+    return dayjs(date).format('Do MMMM YYYY');
+  }
   return (
     <>
       <Grid container spacing={1.5} justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
@@ -162,7 +168,7 @@ function AddFeedback() {
                   Event Name: {event.name}
                 </Typography>
                 <Typography variant="body2" component="div">
-                  Date: {event.date}
+                  Date: {formatDate(event.date)}
                 </Typography>
               </Stack>
             </CardContent>

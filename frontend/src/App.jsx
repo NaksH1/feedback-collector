@@ -6,24 +6,27 @@ import Event from './components/Event.jsx';
 import SingleEvent from './components/SingleEvent.jsx';
 import { AuthProvider } from './api/AuthContext.jsx';
 import AddFeedback from './components/AddFeedback.jsx';
-
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 function App() {
   const navigate = useNavigate();
   return (
     <>
       <div>
-        <AuthProvider>
-          <AppBar />
-          <Routes>
-            {/* <Route path="/" element={<Landing />} /> */}
-            <Route path="/admin/signup" element={<Signup />} />
-            <Route path="/admin/login" element={<Login />} />
-            <Route path="/events" element={<Event />} />
-            <Route path="/events/:eventId" element={<SingleEvent />} />
-            <Route path="/addfeedback" element={<AddFeedback />} />
-          </Routes>
-        </AuthProvider>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <AuthProvider>
+            <AppBar />
+            <Routes>
+              {/* <Route path="/" element={<Landing />} /> */}
+              <Route path="/admin/signup" element={<Signup />} />
+              <Route path="/admin/login" element={<Login />} />
+              <Route path="/events" element={<Event />} />
+              <Route path="/events/:eventId" element={<SingleEvent />} />
+              <Route path="/addfeedback" element={<AddFeedback />} />
+            </Routes>
+          </AuthProvider>
+        </LocalizationProvider>
       </div>
     </>
   )

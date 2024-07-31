@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import AddEvent, { postEvent } from './AddEvent';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 function Event() {
   const [open, setOpen] = useState(false);
   const [events, setEvents] = useState([]);
   const [name, setName] = useState('Bhava Spandana');
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(dayjs());
   const [programCoordinator, setProgramCoordinator] = useState("");
 
   const fetchEvents = () => {
@@ -83,24 +84,29 @@ function Event() {
   )
 }
 
-export function Events(prop) {
+export function Events({ event }) {
   const navigate = useNavigate();
   function handleEventClick() {
-    navigate(`/events/${prop.event._id}`);
+    navigate(`/events/${event._id}`);
   }
-
+  const formatDate = (date) => {
+    if (!date)
+      return '';
+    return dayjs(date).format('Do MMMM YYYY');
+  }
+  const date = formatDate(event.date);
   return (
     <div>
       <Card sx={{ margin: 2, width: 300, minHeight: 200 }} onClick={handleEventClick}>
-        <img src={prop.event.image} style={{ width: 300 }}></img>
+        <img src={event.image} style={{ width: 300 }}></img>
         <Typography textAlign={"center"} variant='h5'>
-          {prop.event.name}
+          {event.name}
         </Typography>
         <Typography textAlign={"center"} variant='subtitle1'>
-          {prop.event.date}
+          {date}
         </Typography>
         <Typography textAlign={"center"} variant='subtitle1'>
-          {prop.event.programCoordinator}
+          {event.programCoordinator}
         </Typography>
 
       </Card>

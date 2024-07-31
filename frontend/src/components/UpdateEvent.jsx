@@ -1,15 +1,16 @@
 import { Button, Card, MenuItem, Stack, TextField } from "@mui/material";
 import axios from "axios";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import { DatePicker } from "@mui/x-date-pickers";
 
 function UpdateCard(prop) {
   const [name, setName] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(dayjs());
   const [programCoordinator, setProgramCoordinator] = useState('');
-
   useEffect(() => {
     setName(prop.event.name);
-    setDate(prop.event.date);
+    setDate(dayjs(prop.event.date));
     setProgramCoordinator(prop.event.programCoordinator);
   }, [prop.event]);
 
@@ -74,16 +75,18 @@ function UpdateCard(prop) {
             )
           })}
         </TextField>
-        <TextField
-          onChange={(e) => {
-            setDate(e.target.value)
-          }}
+        <DatePicker
           fullWidth={true}
-          id="outlined-basic"
-          label="Date"
-          variant="outlined"
+          onChange={(newValue) => (setDate(newValue))}
+          label="Start Date"
           value={date}
-        ></TextField>
+          sx={{ width: 350 }}
+          slotProps={{
+            textField: {
+              helperText: 'Date format : MM/DD/YYYY',
+            },
+          }}
+        ></DatePicker>
         <TextField
           onChange={(e) => {
             setProgramCoordinator(e.target.value)

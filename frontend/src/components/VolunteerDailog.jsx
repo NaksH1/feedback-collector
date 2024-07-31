@@ -6,6 +6,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 function VolunteerDailog({ open, setOpen, volunteer, event }) {
   const navigate = useNavigate();
@@ -35,6 +36,11 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
     const exist = feedbacks.find(f => (f.eventId === event._id));
     console.log(exist);
     return Boolean(exist);
+  }
+  const formatDate = (date) => {
+    if (!date)
+      return '';
+    return dayjs(date).format('Do MMMM YYYY');
   }
   return (
     <>
@@ -84,7 +90,7 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
                         <TableCell component="th" scope="row">
                           {row.eventName}
                         </TableCell>
-                        <TableCell>{row.eventDate}</TableCell>
+                        <TableCell>{formatDate(row.eventDate)}</TableCell>
                         <TableCell>{row.givenBy}</TableCell>
 
                       </TableRow>

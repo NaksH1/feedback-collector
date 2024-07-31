@@ -1,6 +1,7 @@
 import { Button, MenuItem, Stack, TextField } from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
+import { DatePicker } from "@mui/x-date-pickers";
 
 
 function AddEvent({ name, setName, date, setDate, programCoordinator, setProgramCoordinator }) {
@@ -18,6 +19,13 @@ function AddEvent({ name, setName, date, setDate, programCoordinator, setProgram
       label: 'Inner Engineering Retreat'
     }
   ];
+
+  // const dateNow = new Date();
+  // const year = dateNow.getFullYear();
+  // const monthWithOffset = (dateNow.getUTCMonth() + 1).toString();
+  // const month = monthWithOffset.length < 2 ? `0${monthWithOffset}` : monthWithOffset;
+  // const date1 = dateNow.getUTCDate().toString().length < 2 ? `0${dateNow.getUtcDate()}` : dateNow.getUTCDate();
+  // const defaultDate = `${year}-${month}-${date1}`;
 
   return (
     <>
@@ -38,15 +46,18 @@ function AddEvent({ name, setName, date, setDate, programCoordinator, setProgram
             </MenuItem>
           })}
         </TextField>
-        <TextField
-          onChange={(e) => {
-            setDate(e.target.value)
-          }}
+        <DatePicker
           fullWidth={true}
-          id="outlined-basic"
-          label="Date"
-          variant="outlined"
-        ></TextField>
+          onChange={(newValue) => (setDate(newValue))}
+          label="Start Date"
+          value={date}
+          sx={{ width: 350 }}
+          slotProps={{
+            textField: {
+              helperText: 'Date format : MM/DD/YYYY',
+            },
+          }}
+        ></DatePicker>
         <TextField
           onChange={(e) => {
             setProgramCoordinator(e.target.value)
@@ -57,7 +68,6 @@ function AddEvent({ name, setName, date, setDate, programCoordinator, setProgram
           variant="outlined"
         ></TextField>
       </Stack>
-      {/* </Card> */}
     </>
   )
 }
