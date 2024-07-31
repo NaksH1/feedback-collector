@@ -35,7 +35,6 @@ router.get('/:volunteerId', authenticateJwt, async (req, res) => {
     }
   }));
   if (volunteer) {
-    console.log(feedbacks);
     res.json({ feedbacks: feedbacks || [] });
   }
   else

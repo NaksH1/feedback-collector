@@ -30,6 +30,12 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
   function addFeedback() {
     navigate('/addFeedback', { state: { volunteerName: volunteer.name, volunteerId: volunteer._id, event: event } })
   }
+
+  const feedbackExist = () => {
+    const exist = feedbacks.find(f => (f.eventId === event._id));
+    console.log(exist);
+    return Boolean(exist);
+  }
   return (
     <>
       <Dialog
@@ -53,7 +59,7 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
                 <Typography variant='body1'>
                   Feedbacks
                 </Typography>
-                {volunteer.type === 'training' ? <AddCircleOutlinedIcon fontSize="large" onClick={() => addFeedback()} /> : <></>}
+                {volunteer.type === 'training' && !feedbackExist() ? <AddCircleOutlinedIcon fontSize="large" onClick={() => addFeedback()} /> : <></>}
               </Stack>
               <TableContainer component={Paper} sx={{ marginTop: 2 }}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">

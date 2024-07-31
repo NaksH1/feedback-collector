@@ -12,7 +12,7 @@ function VolunteerTable({ event }) {
   const [addVolunteer, setAddVolunteer] = useState(false);
   useEffect(() => {
     if (event && event._id) {
-      console.log(event._id);
+
       axios({
         method: "get",
         url: `http://localhost:3000/event/getVolunteer/${event._id}`,

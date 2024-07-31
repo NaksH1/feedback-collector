@@ -38,7 +38,20 @@ const feedbackSchema = new mongoose.Schema({
   eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' },
   volunteerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Volunteer' },
   remark: String,
-  feedback: String,
+  areas: {
+    choice1: { type: Boolean, default: false },
+    choice2: { type: Boolean, default: false }, choice3: { type: Boolean, default: false }, choice4: { type: Boolean, default: false },
+    choice5: { type: Boolean, default: false }, choice6: { type: Boolean, default: false }, choice7: { type: Boolean, default: false },
+    choice8: { type: Boolean, default: false }, choice9: { type: Boolean, default: false }, choice10: { type: Boolean, default: false }
+  },
+  activity: String, comment1: String, communicate: String, comment2: String, assign: String, comment3: String,
+  listen: String, comment4: String, stretch: String, comment5: String,
+  available: {
+    achoice1: { type: Boolean, default: false }, achoice2: { type: Boolean, default: false },
+    achoice3: { type: Boolean, default: false }, achoice4: { type: Boolean, default: false },
+    achoice5: { type: Boolean, default: false }, achoice6: { type: Boolean, default: false }
+  },
+  others: String, comment6: String, overall: String, remarks: String,
   givenBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
