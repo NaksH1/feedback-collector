@@ -21,7 +21,7 @@ const eventSchema = new mongoose.Schema({
   name: String,
   date: String,
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
-  programCoordinators: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+  programCoordinator: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
   volunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Volunteer' }],
   published: Boolean,
   image: String

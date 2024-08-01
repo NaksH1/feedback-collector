@@ -26,12 +26,12 @@ router.post('/', authenticateJwt, async (req, res) => {
 });
 
 router.get('/', authenticateJwt, async (req, res) => {
-  const events = await Event.find({});
+  const events = await Event.find({}).populate({ path: 'programCoordinator', select: 'name' });
   res.json({ events: events });
 });
 
 router.get('/:eventId', authenticateJwt, async (req, res) => {
-  const event = await Event.findById(req.params.eventId);
+  const event = await Event.findById(req.params.eventId).populate({ path: 'programCoordinator', select: 'name' });
   if (event)
     res.status(200).json({ event: event });
   else
@@ -39,6 +39,7 @@ router.get('/:eventId', authenticateJwt, async (req, res) => {
 })
 
 router.put('/:eventId', authenticateJwt, async (req, res) => {
+  req.body.programCoordinator = req.body.programCoordinator.id;
   const event = await Event.findByIdAndUpdate(req.params.eventId, req.body, { new: true });
   if (event) {
     if (event.name === 'Bhava Spandana')

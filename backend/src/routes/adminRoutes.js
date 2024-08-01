@@ -60,4 +60,22 @@ router.get('/me', authenticateJwt, async (req, res, next) => {
   }
 })
 
+router.get('/', authenticateJwt, async (req, res, next) => {
+  try {
+    let admins = await Admin.find({});
+    admins = admins.map((admin) => {
+      return (
+        {
+          _id: admin._id,
+          name: admin.name
+        }
+      )
+    })
+    res.json({ message: "List of admins", admins: admins });
+  }
+  catch (err) {
+    next(err);
+  }
+})
+
 module.exports = router;

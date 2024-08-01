@@ -1,5 +1,5 @@
-import { Button, MenuItem, Stack, TextField } from "@mui/material";
-import { useState } from "react";
+import { Autocomplete, Button, MenuItem, Stack, TextField } from "@mui/material";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { DatePicker } from "@mui/x-date-pickers";
 
@@ -19,7 +19,32 @@ function AddEvent({ name, setName, date, setDate, programCoordinator, setProgram
       label: 'Inner Engineering Retreat'
     }
   ];
+  const [value, setValue] = useState();
+  const [inputValue, setInputValue] = useState('');
+  const [options, setOptions] = useState();
 
+  useEffect(() => {
+    axios({
+      method: 'get',
+      url: 'http://localhost:3000/admin/',
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }
+    }).then(async (resp) => {
+      const newOptions = await resp.data.admins.map((admin) => {
+        return ({
+          label: admin.name,
+          id: admin._id
+        })
+      })
+      setOptions(newOptions);
+      setValue(newOptions[1])
+    })
+  }, []);
+
+  // useEffect(() => {
+  //   setValue(options[0]);
+  // }, [options])
   // const dateNow = new Date();
   // const year = dateNow.getFullYear();
   // const monthWithOffset = (dateNow.getUTCMonth() + 1).toString();
@@ -58,15 +83,21 @@ function AddEvent({ name, setName, date, setDate, programCoordinator, setProgram
             },
           }}
         ></DatePicker>
-        <TextField
-          onChange={(e) => {
-            setProgramCoordinator(e.target.value)
+        <Autocomplete
+          value={value}
+          onChange={(event, newValue) => {
+            setValue(newValue);
+            setProgramCoordinator(value.id);
           }}
-          fullWidth={true}
-          id="outlined-basic"
-          label="Program Coordinator"
-          variant="outlined"
-        ></TextField>
+          inputValue={inputValue}
+          onInputChange={(event, newInputValue) => {
+            setInputValue(newInputValue);
+          }}
+          id="controllable-states-demo"
+          options={options}
+          sx={{ width: 350 }}
+          renderInput={(params) => <TextField {...params} label="Program Coordinator" />}
+        />
       </Stack>
     </>
   )
@@ -86,4 +117,3 @@ export function postEvent(name, date, programCoordinator) {
   });
 }
 export default AddEvent;
-

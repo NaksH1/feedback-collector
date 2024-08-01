@@ -105,9 +105,9 @@ export function Events({ event }) {
         <Typography textAlign={"center"} variant='subtitle1'>
           {date}
         </Typography>
-        <Typography textAlign={"center"} variant='subtitle1'>
-          {event.programCoordinator}
-        </Typography>
+        {event.programCoordinator ? <Typography textAlign={"center"} variant='subtitle1'>
+          {event.programCoordinator.name}
+        </Typography> : <></>}
 
       </Card>
     </div>

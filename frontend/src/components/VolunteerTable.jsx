@@ -21,11 +21,13 @@ function VolunteerTable({ event }) {
         }
       }).then((res) => {
         setVolunteers(res.data.volunteers);
+        console.log(res.data.volunteers);
       });
     }
   }, [event]);
   function handleSuccessfulVolunteerAdd(newVolunteer) {
     setVolunteers((preVolunteers) => [...preVolunteers, newVolunteer]);
+    window.location.reload()
   }
 
   function openVolunteerDailog(volunteer) {
