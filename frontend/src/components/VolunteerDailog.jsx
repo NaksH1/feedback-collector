@@ -17,9 +17,10 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
   }
   const [feedbacks, setFeedbacks] = useState([]);
   useEffect(() => {
+    console.log(volunteer);
     axios({
       method: "get",
-      url: `http://localhost:3000/feedback/${volunteer._id}`,
+      url: `http://localhost:3000/feedback/${volunteer.volunteerId._id}`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }
@@ -29,7 +30,10 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
   }, [])
 
   function addFeedback() {
-    navigate('/addFeedback', { state: { volunteerName: volunteer.name, volunteerId: volunteer._id, event: event } })
+    if (type === 'training')
+      navigate('/addFeedback', { state: { volunteerName: volunteer.volunteerId.name, volunteerId: volunteer.volunteerId._id, event: event } })
+    else if (type === 'programVolunteer')
+      navigate('/addpvfeedback', { state: { volunteerName: volunteer.volunteerId.name, volunteerId: volunteer.volunteerId._id, event: event } })
   }
 
   const feedbackExist = () => {
@@ -54,7 +58,7 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
         <DialogTitle id="responsive-dialog-title">
           {volunteer ? (
             <Typography variant='subtitle1' >
-              {volunteer.name}
+              {volunteer.volunteerId.name}
             </Typography>
           ) : <>"Loading..."</>}
         </DialogTitle>

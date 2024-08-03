@@ -63,15 +63,15 @@ function VolunteerTable({ event }) {
           <TableBody>
             {volunteers.map((row) => (
               <TableRow onClick={() => openVolunteerDailog(row)}
-                key={row.mobileNumber}
+                key={row.volunteerId.mobileNumber}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {row.name}
+                  {row.volunteerId.name}
                 </TableCell>
                 <TableCell align="right">{row.type === 'training' ? "Training Sahabhagi" : "Potential Sahabhagi"}</TableCell>
-                <TableCell align="right">{row.mobileNumber}</TableCell>
-                <TableCell align="right">{row.createdBy.name}</TableCell>
+                <TableCell align="right">{row.volunteerId.mobileNumber}</TableCell>
+                <TableCell align="right">{row.volunteerId.createdBy.name}</TableCell>
               </TableRow>
             ))}
           </TableBody>

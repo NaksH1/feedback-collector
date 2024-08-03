@@ -33,24 +33,18 @@ function AddEvent({ name, setName, date, setDate, programCoordinator, setProgram
     }).then(async (resp) => {
       const newOptions = await resp.data.admins.map((admin) => {
         return ({
-          label: admin.name,
+          name: admin.name,
           id: admin._id
         })
       })
       setOptions(newOptions);
-      setValue(newOptions[1])
+      // setValue(newOptions[1])
     })
   }, []);
 
   // useEffect(() => {
   //   setValue(options[0]);
   // }, [options])
-  // const dateNow = new Date();
-  // const year = dateNow.getFullYear();
-  // const monthWithOffset = (dateNow.getUTCMonth() + 1).toString();
-  // const month = monthWithOffset.length < 2 ? `0${monthWithOffset}` : monthWithOffset;
-  // const date1 = dateNow.getUTCDate().toString().length < 2 ? `0${dateNow.getUtcDate()}` : dateNow.getUTCDate();
-  // const defaultDate = `${year}-${month}-${date1}`;
 
   return (
     <>
@@ -95,6 +89,7 @@ function AddEvent({ name, setName, date, setDate, programCoordinator, setProgram
           }}
           id="controllable-states-demo"
           options={options}
+          getOptionLabel={(option) => option.name}
           sx={{ width: 350 }}
           renderInput={(params) => <TextField {...params} label="Program Coordinator" />}
         />

@@ -1,6 +1,7 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, Stack, TextField } from "@mui/material";
-import { useState } from "react";
+import { Alert, Autocomplete, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, Snackbar, Stack, TextField, createFilterOptions } from "@mui/material";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import { RestaurantOutlined } from "@mui/icons-material";
 
 
 function AddVolunteer({ open, close, eventId, onSuccess }) {
@@ -16,8 +17,45 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
     {
       value: 'training',
       label: 'Training Sahabhagi'
+    },
+    {
+      value: 'programVolunteer',
+      label: 'Program Volunteer under Obs.'
     }
   ]
+  const [value, setValue] = useState();
+  const filter = createFilterOptions();
+  const [volunteersList, setVolunteersList] = useState([]);
+  const [alertPresent, setAlertPresent] = useState(false);
+
+  useEffect(() => {
+    axios({
+      method: 'get',
+      url: 'http://localhost:3000/volunteer',
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      }
+    }).then(async (resp) => {
+      const vArray = await resp.data.volunteers.map((volunteer) => {
+        return {
+          name: volunteer.name,
+          mobileNumber: volunteer.mobileNumber
+        }
+      });
+      setVolunteersList(vArray);
+    })
+  }, []);
+  useEffect(() => {
+    if (value) {
+      const volunteer = volunteersList.find(v => (v.mobileNumber === value.mobileNumber));
+      if (volunteer)
+        setName(volunteer.name);
+      else
+        setName("");
+    }
+    else
+      setName("");
+  }, [value, volunteersList])
   function handleSubmit(e) {
     e.preventDefault();
     axios({
@@ -28,7 +66,7 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
       },
       data: {
         name: name,
-        mobileNumber: mobileNumber,
+        mobileNumber: value.mobileNumber,
         type: type,
         eventId: eventId,
         remark: remark
@@ -39,10 +77,27 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
 
     }).catch((err) => {
       console.log(err);
+      close();
+      setAlertPresent(true);
     });
+  }
+  function handleClose(event, reason) {
+    if (reason === 'clickaway')
+      return;
+    setAlertPresent(false);
   }
   return (
     <>
+      <Snackbar open={alertPresent} autoHideDuration={6000} onClose={handleClose}>
+        <Alert
+          onClose={handleClose}
+          severity="warning"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          Volunteer is already present!!
+        </Alert>
+      </Snackbar>
       <Dialog
         open={open}
         onClose={close}
@@ -54,10 +109,68 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
         <DialogTitle>Add Volunteer</DialogTitle>
         <DialogContent>
           <Stack spacing={2} direction="column" alignItems="center" justifyContent="center" sx={{ minWidth: 400 }}>
+            <Autocomplete
+              value={value}
+              onChange={(event, newValue) => {
+                if (typeof newValue === 'string') {
+                  setValue({
+                    mobileNumber: newValue,
+                  });
+                } else if (newValue && newValue.inputValue) {
+                  setValue({
+                    mobileNumber: newValue.inputValue,
+                  });
+                } else {
+                  setValue(newValue);
+                }
+              }}
+              filterOptions={(options, params) => {
+                const filtered = filter(options, params);
+                const { inputValue } = params;
+                const isExisting = options.some((option) => inputValue === option.title);
+                if (inputValue !== '' && !isExisting) {
+                  filtered.push({
+                    inputValue,
+                    mobileNumber: `Add "${inputValue}"`,
+                  });
+                }
+
+                return filtered;
+              }}
+              selectOnFocus
+              clearOnBlur
+              handleHomeEndKeys
+              id="free-solo-with-text-demo"
+              options={volunteersList}
+              getOptionLabel={(option) => {
+                if (typeof option === 'string') {
+                  return option;
+                }
+                if (option.inputValue) {
+                  return option.inputValue;
+                }
+                return option.mobileNumber;
+              }}
+              renderOption={(props, option) => {
+                const { key, ...optionProps } = props;
+                return (
+                  <li key={key} {...optionProps}>
+                    {option.mobileNumber}
+                  </li>
+                );
+              }}
+              fullWidth
+              freeSolo
+              renderInput={(params) => (
+                <TextField {...params} label="Mobile Number" />
+              )}
+            />
+
             <TextField
               onChange={(e) => {
                 setName(e.target.value);
               }}
+              value={name}
               autoFocus
               required
               fullWidth
@@ -66,18 +179,7 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
               label="Name"
               variant="outlined">
             </TextField>
-            <TextField
-              onChange={(e) => {
-                setMobileNumber(e.target.value);
-              }}
-              autoFocus
-              required
-              fullWidth
-              id="outlined-basic"
-              label="Mobile Number"
-              variant="outlined"
-            >
-            </TextField>
+
             <TextField
               autoFocus
               required

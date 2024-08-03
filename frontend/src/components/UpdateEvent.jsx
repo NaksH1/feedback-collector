@@ -1,4 +1,3 @@
-
 import { Autocomplete, Button, MenuItem, Stack, TextField } from "@mui/material";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -30,7 +29,7 @@ function UpdateCard({ event, setEvent }) {
       }
     }).then((resp) => {
       const newOptions = resp.data.admins.map((admin) => ({
-        label: admin.name,
+        name: admin.name,
         id: admin._id
       }));
       setOptions(newOptions);
@@ -99,6 +98,7 @@ function UpdateCard({ event, setEvent }) {
         onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
         id="controllable-states-demo"
         options={options}
+        getOptionLabel={(option) => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         sx={{ width: 350 }}
         renderInput={(params) => <TextField {...params} label="Program Coordinator" />}

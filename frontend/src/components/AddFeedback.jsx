@@ -76,7 +76,7 @@ function AddFeedback() {
       achoice6: false
     }, others: '', comment6: '', overall: '', remarks: '',
     errors: {
-      activity: false, comment1: false, communicate: false, comment2: false, assign: false, commnet3: false,
+      activity: false, comment1: false, communicate: false, comment2: false, assign: false, comment3: false,
       listen: false, comment4: false, stretch: false, comment5: false, others: false, comment6: false,
       overall: false, remarks: false
     }
@@ -112,7 +112,7 @@ function AddFeedback() {
     e.preventDefault();
     const { areas, activity, comment1, communicate, comment2, assign, comment3, listen,
       comment4, stretch, comment5, available, others, comment6, overall, remarks } = state;
-
+    console.log(state);
     const newErrors = {
       activity: !activity, comment1: !comment1, communicate: !communicate, comment2: !comment2, assign: !assign,
       comment3: !comment3, listen: !listen, comment4: !comment4, stretch: !stretch, comment5: !comment5,
@@ -135,10 +135,8 @@ function AddFeedback() {
       data: {
         eventId: event._id,
         volunteerId: volunteerId,
-        areas: areas, activity: activity, comment1: comment1, communicate: communicate,
-        comment2: comment2, assign: assign, comment3: comment3, listen: listen,
-        comment4: comment4, stretch: stretch, comment5: comment5, available: available,
-        others: others, comment6: comment6, overall: overall, remarks: remarks
+        type: 'training',
+        training: state
       }
     })
     alert('feedback submitted');
@@ -211,7 +209,7 @@ function AddFeedback() {
   )
 }
 
-function Question({ value, change, name, error }) {
+export function Question({ value, change, name, error }) {
   return (
     <Grid item xs={12} sm={8} md={6} lg={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
@@ -259,7 +257,7 @@ function MultipleChoice({ question, array, handleChoice, choices }) {
 
   )
 }
-function SingleChoice({ question, array, change, state, name, error }) {
+export function SingleChoice({ question, array, change, state, name, error }) {
   return (
     <Grid item xs={12} sm={8} md={6} lg={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>

@@ -61,24 +61,32 @@ router.post('/addVolunteer', authenticateJwt, async (req, res) => {
   const { name, mobileNumber, type, eventId } = req.body;
   let volunteer = await Volunteer.findOne({ mobileNumber: mobileNumber });
   if (!volunteer) {
-    volunteer = new Volunteer({ name: name, mobileNumber: mobileNumber, type: type, createdBy: req.user.id, feedbacks: [] });
-    if (type === 'potential') {
-      const feedback = new Feedback({ eventId: eventId, volunteerId: volunteer._id, remark: req.body.remark, givenBy: req.user.id });
-      await feedback.save();
-      volunteer.feedbacks.push(feedback.id);
-    }
+    volunteer = new Volunteer({ name: name, mobileNumber: mobileNumber, createdBy: req.user.id, feedbacks: [] });
     await volunteer.save();
   }
-  const event = await Event.findById({ _id: eventId });
-  event.volunteers.push(volunteer._id);
-  await event.save();
-  res.status(201).json({ message: "Volunteer added to event", volunteer });
+  const event = await Event.findById(eventId);
+  const exist = event.volunteers.find(v => (v.volunteerId.equals(volunteer._id)));
+  if (exist) {
+    res.status(409).json({ message: "Volunteer already present" });
+  }
+  else {
+    if (type === 'potential') {
+      const potentialFeedback = { remarks: req.body.remarks };
+      const feedback = new Feedback({ eventId: eventId, volunteerId: volunteer._id, type: type, potential: potentialFeedback, givenBy: req.user.id });
+      await feedback.save();
+      volunteer.feedbacks.push(feedback.id);
+      await volunteer.save();
+    }
+    event.volunteers.push({ volunteerId: volunteer._id, type: type });
+    await event.save();
+    res.status(201).json({ message: "Volunteer added to event", volunteer });
+  }
 });
 
 router.get('/getVolunteer/:eventId', authenticateJwt, async (req, res) => {
   const eventId = req.params.eventId;
   const event = await Event.findById(eventId).populate({
-    path: 'volunteers',
+    path: 'volunteers.volunteerId',
     populate: { path: 'createdBy', select: 'name' }
   });
   if (event) {
