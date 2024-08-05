@@ -79,7 +79,9 @@ const trainingSchema = new mongoose.Schema({
   others: String,
   comment6: String,
   overall: String,
-  remarks: String
+  remarks: String,
+  status: String,
+  recommendation: String
 });
 
 const programVolunteerSchema = new mongoose.Schema({

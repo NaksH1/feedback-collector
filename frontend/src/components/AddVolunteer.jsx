@@ -20,7 +20,7 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
     },
     {
       value: 'programVolunteer',
-      label: 'Program Volunteer under Obs.'
+      label: 'Program Volunteer Under Obs.'
     }
   ]
   const [value, setValue] = useState();
@@ -69,7 +69,7 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
         mobileNumber: value.mobileNumber,
         type: type,
         eventId: eventId,
-        remark: remark
+        remarks: remark
       }
     }).then((res) => {
       onSuccess(res.data.volunteer)

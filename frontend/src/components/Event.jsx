@@ -1,18 +1,15 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Card, DialogContent, Stack, TextField, Typography, DialogTitle, Dialog, DialogActions, Button } from "@mui/material";
+import { Alert, Card, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import AddEvent, { postEvent } from './AddEvent';
+import AddEvent from './AddEvent';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 
 function Event() {
   const [open, setOpen] = useState(false);
   const [events, setEvents] = useState([]);
-  const [name, setName] = useState('Bhava Spandana');
-  const [date, setDate] = useState(dayjs());
-  const [programCoordinator, setProgramCoordinator] = useState("");
-
+  const [eventAdded, setEventAdded] = useState(false);
   const fetchEvents = () => {
     axios({
       method: "get",
@@ -31,49 +28,30 @@ function Event() {
     fetchEvents();
   }, []);
 
-  const handleSubmit = () => {
-    postEvent(name, date, programCoordinator).then((res) => {
-      alert("Event Created");
-      fetchEvents();
-    })
-    setOpen(false);
-
-  }
-
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
   const handleClose = () => {
     setOpen(false);
+    setEventAdded(true);
   };
+  const handleOpen = () => {
+    setOpen(true);
+  };
+  const handleAlertClose = (event, reason) => {
+    if (reason === 'clickaway')
+      return;
+    setEventAdded(false);
+  }
   return (
     <>
+      <Snackbar open={eventAdded} autoHideDuration={6000} onClose={handleAlertClose}>
+        <Alert onClose={handleAlertClose} severity="success" variant="filled" sx={{ width: '100%' }}>
+          Event added
+        </Alert>
+      </Snackbar>
       <Stack direction="row" spacing={2} alignItems="center" sx={{ marginTop: 2, marginRight: 1 }}>
         <TextField id="filled-basic" label="Search Event" variant="filled" fullWidth />
-        <AddIcon variant="outlined" onClick={handleClickOpen} fontSize='medium' ></AddIcon>
-        <Dialog
-          open={open}
-          onClose={handleClose}
-        >
-          <DialogTitle>Enter Event Details</DialogTitle>
-          <DialogContent>
-            <AddEvent
-              name={name}
-              setName={setName}
-              date={date}
-              setDate={setDate}
-              programCoordinator={programCoordinator}
-              setProgramCoordinator={setProgramCoordinator} />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+        <AddIcon variant="outlined" onClick={handleOpen} fontSize='medium' ></AddIcon>
+        {open ? <AddEvent open={open} setOpen={setOpen} setEvents={setEvents} handleClose={handleClose} /> : <></>}
 
-            <Button variant="outlined" onClick={handleSubmit}>Submit</Button>
-
-          </DialogActions>
-        </Dialog>
       </Stack>
       <Stack direction="row" spacing={2} sx={{ marginTop: 2, display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
         {events.map((event) => {

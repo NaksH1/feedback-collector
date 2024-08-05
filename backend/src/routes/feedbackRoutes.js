@@ -49,4 +49,28 @@ router.get('/:volunteerId', authenticateJwt, async (req, res) => {
     res.status(404).json({ message: "Volunteer not found" });
 });
 
+router.get('/view/:feedbackId', authenticateJwt, async (req, res) => {
+  const feedback = await Feedback.findById(req.params.feedbackId).populate([
+    { path: 'eventId' },
+    { path: 'volunteerId', select: 'name' },
+    { path: 'givenBy', select: 'name' }
+  ]);
+  if (feedback) {
+    res.json({ feedback: feedback });
+  }
+  else
+    res.status(404).json({ message: "Feedback not found" });
+})
+
+router.put('/:feedbackId', authenticateJwt, async (req, res) => {
+  const feedbackId = req.params.feedbackId;
+  const feedback = await Feedback.findByIdAndUpdate(feedbackId, req.body, { new: true });
+  if (feedback)
+    res.json({ message: "Feedback updated", feedback: feedback });
+  else
+    res.json({ message: "Feedback not found" });
+})
+
+
 module.exports = router;
+

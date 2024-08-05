@@ -29,7 +29,7 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
     });
   }, [])
 
-  function addFeedback() {
+  function addFeedback(type) {
     if (type === 'training')
       navigate('/addFeedback', { state: { volunteerName: volunteer.volunteerId.name, volunteerId: volunteer.volunteerId._id, event: event } })
     else if (type === 'programVolunteer')
@@ -45,6 +45,9 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
     if (!date)
       return '';
     return dayjs(date).format('Do MMMM YYYY');
+  }
+  const viewFeedback = (feedbackId) => {
+    navigate(`/viewfeedback/${feedbackId}`);
   }
   return (
     <>
@@ -69,7 +72,7 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
                 <Typography variant='body1'>
                   Feedbacks
                 </Typography>
-                {volunteer.type === 'training' && !feedbackExist() ? <AddCircleOutlinedIcon fontSize="large" onClick={() => addFeedback()} /> : <></>}
+                {volunteer.type !== 'potential' && !feedbackExist() ? <AddCircleOutlinedIcon fontSize="large" onClick={() => addFeedback(volunteer.type)} /> : <></>}
               </Stack>
               <TableContainer component={Paper} sx={{ marginTop: 2 }}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -88,7 +91,7 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                       >
                         <TableCell >
-                          <VisibilityIcon />
+                          <VisibilityIcon onClick={() => viewFeedback(row._id)} />
                           <DeleteOutlineIcon />
                         </TableCell>
                         <TableCell component="th" scope="row">

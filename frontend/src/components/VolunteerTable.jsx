@@ -10,6 +10,20 @@ function VolunteerTable({ event }) {
   const [volunteerDailog, setVolunteerDailog] = useState(false);
   const [selectedVolunteer, setSelectedVolunteer] = useState(null);
   const [addVolunteer, setAddVolunteer] = useState(false);
+  const volunteerType = [
+    {
+      value: 'potential',
+      label: 'Potential Sahabhagi'
+    },
+    {
+      value: 'training',
+      label: 'Training Sahabhagi'
+    },
+    {
+      value: 'programVolunteer',
+      label: 'Program Volunteer Under Obs.'
+    }
+  ]
   useEffect(() => {
     if (event && event._id) {
 
@@ -21,7 +35,6 @@ function VolunteerTable({ event }) {
         }
       }).then((res) => {
         setVolunteers(res.data.volunteers);
-        console.log(res.data.volunteers);
       });
     }
   }, [event]);
@@ -43,6 +56,10 @@ function VolunteerTable({ event }) {
   }
   function closeAddVolunteer() {
     setAddVolunteer(false);
+  }
+  function getVolunteerType(type) {
+    const volunteerTypeObj = volunteerType.find(v => (v.value === type));
+    return volunteerTypeObj ? volunteerTypeObj.label : type;
   }
   return (
     <>
@@ -69,7 +86,7 @@ function VolunteerTable({ event }) {
                 <TableCell component="th" scope="row">
                   {row.volunteerId.name}
                 </TableCell>
-                <TableCell align="right">{row.type === 'training' ? "Training Sahabhagi" : "Potential Sahabhagi"}</TableCell>
+                <TableCell align="right">{getVolunteerType(row.type)}</TableCell>
                 <TableCell align="right">{row.volunteerId.mobileNumber}</TableCell>
                 <TableCell align="right">{row.volunteerId.createdBy.name}</TableCell>
               </TableRow>
