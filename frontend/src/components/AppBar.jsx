@@ -34,13 +34,18 @@ function Appbar() {
     setUserName(null);
     window.location = '/admin/login';
   }
+  function navigateEvent() {
+    navigate('./events');
+  }
   return (
     <>
-      <Stack direction="row" justifyContent="space-between">
-        <Stack>
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Stack direction="row" spacing={1.5}>
           <Typography variant="h6">
             Feedback-Collector
           </Typography>
+          <Button variant="text" onClick={() => navigateEvent()}>EVENTS</Button>
+
         </Stack>
         {isLoggedIn ? (
           <Stack direction="row" alignItems="center">

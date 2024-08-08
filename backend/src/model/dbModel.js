@@ -38,7 +38,9 @@ const volunteerSchema = new mongoose.Schema({
 });
 
 const potentialSchema = new mongoose.Schema({
-  remarks: String
+  remarks: String,
+  status: String,
+  recommendation: String
 });
 
 const choiceSchema = new mongoose.Schema({
@@ -85,14 +87,16 @@ const trainingSchema = new mongoose.Schema({
 });
 
 const programVolunteerSchema = new mongoose.Schema({
-  area: String,
+  activity: String,
   presentation: String,
   communication: String,
   fitness: String,
   commitment: String,
   remarks: String,
-  areaCanBeTrained: String,
-  overall: String
+  train: String,
+  overall: String,
+  status: String,
+  recommendation: String
 })
 
 const feedbackSchema = new mongoose.Schema({
@@ -102,7 +106,8 @@ const feedbackSchema = new mongoose.Schema({
   potential: potentialSchema,
   training: trainingSchema,
   programVolunteer: programVolunteerSchema,
-  givenBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' }
+  givenBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+  deleted_at: { type: Date, default: null }
 });
 
 feedbackSchema.pre('validate', function(next) {
@@ -127,6 +132,20 @@ feedbackSchema.pre('validate', function(next) {
   }
   next();
 });
+
+feedbackSchema.methods.softDelete = function() {
+  this.deleted_at = new Date();
+  return this.save();
+}
+
+feedbackSchema.methods.restore = function() {
+  this.deleted_at = null;
+  return this.save();
+}
+
+feedbackSchema.statics.findNotDeleted = function() {
+  return this.find({ deleted_at: { $eq: null } });
+}
 
 const Admin = mongoose.model('Admin', adminSchema);
 const User = mongoose.model('User', userSchema);

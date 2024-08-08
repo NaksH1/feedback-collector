@@ -22,28 +22,27 @@ router.post('/', authenticateJwt, async (req, res) => {
   }
 });
 
+router.get('/full/:feedbackId', authenticateJwt, async (req, res) => {
+  const feedback = await Feedback.findById(req.params.feedbackId).populate([
+    { path: 'eventId', select: 'name date' },
+    { path: 'givenBy', select: 'name' }
+  ]).exec();
+  if (feedback)
+    res.status(200).json({ feedback: feedback });
+  else
+    res.json(404).json({ message: "feedback not found" });
+})
 router.get('/:volunteerId', authenticateJwt, async (req, res) => {
-  const volunteer = await Volunteer.findById({ _id: req.params.volunteerId }).populate('feedbacks');
-  const feedbacks = await Promise.all(volunteer.feedbacks.map(async (feedback) => {
-    const event = await Event.findById({ _id: feedback.eventId });
-    const eventName = event.name;
-    const eventDate = event.date;
-    return {
-      ...feedback.toObject(),
-      eventName: eventName,
-      eventDate: eventDate
-    }
-  }));
-  // const volunteer1 = await Volunteer.findById(req.params.volunteerId).populate({
-  //   path: 'feedbacks',
-  //   populate: [
-  //     { path: 'eventId', select: 'name' },
-  //     { path: 'givenBy', select: 'name' }
-  //   ]
-  // });
-  // console.log(volunteer1.eventId, volunteer1.givenBy);
+  const volunteer = await Volunteer.findById({ _id: req.params.volunteerId }).populate({
+    path: 'feedbacks',
+    match: { deleted_at: { $eq: null } },
+    populate: [
+      { path: 'eventId', select: 'name date' },
+      { path: 'givenBy', select: 'name' }
+    ]
+  }).exec();
   if (volunteer) {
-    res.json({ feedbacks: feedbacks || [] });
+    res.json({ feedbacks: volunteer.feedbacks || [] });
   }
   else
     res.status(404).json({ message: "Volunteer not found" });
@@ -71,6 +70,23 @@ router.put('/:feedbackId', authenticateJwt, async (req, res) => {
     res.json({ message: "Feedback not found" });
 })
 
+router.delete('/:feedbackId', authenticateJwt, async (req, res) => {
+  const feedbackId = req.params.feedbackId;
+  const feedback = await Feedback.findById(feedbackId);
+  if (!feedback)
+    res.status(404).json({ message: 'Feedback not found' });
+  else {
+    await feedback.softDelete();
+    res.status(200).json({ message: 'Feedback deleted', feedback: feedback });
+  }
+})
 
+router.put('/recover/:feedbackId', authenticateJwt, async (req, res) => {
+  const feedbackId = req.params.feedbackId;
+  const feedback = await Feedback.findById(feedbackId);
+  await feedback.restore();
+  res.status(200).json({ message: "Feedback recovered", feedback: feedback });
+
+})
 module.exports = router;
 

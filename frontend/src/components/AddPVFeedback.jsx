@@ -1,11 +1,11 @@
 import { Alert, Button, Card, CardContent, CardHeader, Divider, FormControl, FormControlLabel, FormHelperText, Grid, Radio, RadioGroup, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Question, SingleChoice } from "./AddFeedback";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import axios from "axios";
 
-const AREA_CHOICES = [
+export const AREA_CHOICES = [
   'Dining',
   'Ushering',
   'Inside hall',
@@ -14,20 +14,20 @@ const AREA_CHOICES = [
   'Audio',
   'Other'
 ]
-const OPTIONS = [
+export const OPTIONS = [
   'Very good',
   'Needs improvement',
   'Not appropriate',
   'Other'
 ]
-const REMARKS = [
+export const REMARKS = [
   'Need to volunteer for more programs',
   'They can be trained',
   'They are not suitable for training',
   'Other'
 ]
 
-function AddPVFeedback({ viewUpdate, otherInfo, toUpdate }) {
+function AddPVFeedback({ viewFeedback, otherInfo, toUpdate }) {
   const location = useLocation();
   const { volunteerName, volunteerId, event } = location.state || otherInfo;
   const navigate = useNavigate();
@@ -44,6 +44,26 @@ function AddPVFeedback({ viewUpdate, otherInfo, toUpdate }) {
   });
   const [errorFilling, setErrorFilling] = useState(false);
 
+  useEffect(() => {
+    if (viewFeedback && viewFeedback.programVolunteer) {
+      console.log("viewFeedback", viewFeedback);
+      setState((preState) => ({
+        ...preState,
+        activity: viewFeedback.programVolunteer.activity || preState.activity,
+        presentation: viewFeedback.programVolunteer.presentation || preState.presentation,
+        communication: viewFeedback.programVolunteer.communication || preState.communication,
+        fitness: viewFeedback.programVolunteer.fitness || preState.fitness,
+        commitment: viewFeedback.programVolunteer.commitment || preState.commitment,
+        remarks: viewFeedback.programVolunteer.remarks || preState.remarks,
+        train: viewFeedback.programVolunteer.train || preState.train,
+        overall: viewFeedback.programVolunteer.overall || preState.overall,
+        status: viewFeedback.programVolunteer.status || preState.status,
+        recommendation: viewFeedback.programVolunteer.recommendation || preState.recommendation,
+        otherFields: viewFeedback.programVolunteer.otherFields || preState.otherFields
+      }))
+    }
+
+  }, [viewFeedback])
 
 
   function handleState(e) {
@@ -90,17 +110,8 @@ function AddPVFeedback({ viewUpdate, otherInfo, toUpdate }) {
   async function handleSubmit(e) {
     e.preventDefault();
     const updatedState = await updateOtherFields();
-    const { activity, presentation, communication, fitness, commitment, remarks, train, overall } = updatedState;
-    const newErrors = {
-      activity: !activity, presentation: !presentation, communication: !communication, fitness: !fitness,
-      commitment: !commitment, remarks: !remarks, train: !train, overall: !overall
-    }
-    setState((preState) => ({ ...preState, errors: newErrors }));
-    const handleError = Object.values(newErrors).some(err => err);
-    if (handleError) {
-      setErrorFilling(true);
+    if (checkError(updatedState))
       return;
-    }
     console.log(updatedState);
     axios({
       method: 'post',
@@ -119,10 +130,49 @@ function AddPVFeedback({ viewUpdate, otherInfo, toUpdate }) {
       navigate(`/events/${event._id}`);
     })
   }
+  function checkError(updatedState) {
+    const { activity, presentation, communication, fitness, commitment, remarks, train, overall } = updatedState;
+    const newErrors = {
+      activity: !activity, presentation: !presentation, communication: !communication, fitness: !fitness,
+      commitment: !commitment, remarks: !remarks, train: !train, overall: !overall
+    }
+    setState((preState) => ({ ...preState, errors: newErrors }));
+    const handleError = Object.values(newErrors).some(err => err);
+    if (handleError) {
+      setErrorFilling(true);
+      return true;
+    }
+    return false;
+  }
+  async function handleUpdate(e) {
+    e.preventDefault();
+    const updatedState = await updateOtherFields();
+    if (checkError(updatedState))
+      return;
+    axios({
+      method: 'put',
+      url: `http://localhost:3000/feedback/${viewFeedback._id}`,
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      },
+      data: {
+        type: 'programVolunteer',
+        programVolunteer: state
+      }
+    }).then((resp) => {
+      alert("Feedback updated");
+      console.log(resp.data);
+    })
+  }
   const handleAlertClose = (event, reason) => {
     if (reason === 'clickaway')
       return;
     setErrorFilling(false);
+  }
+  if (toUpdate && !viewFeedback) {
+    return (
+      <span>Loading...</span>
+    )
   }
   return (
 
@@ -154,26 +204,46 @@ function AddPVFeedback({ viewUpdate, otherInfo, toUpdate }) {
             </CardContent>
           </Card>
         </Grid>
-
+        {toUpdate ?
+          <>
+            <Question value="Status" change={handleState} name="status" defaultVal={state.status} />
+            <Question value="Recommendation" change={handleState} name="recommendation" defaultVal={state.recommendation} />
+          </> :
+          <></>
+        }
         <Single question="Area of activity" array={AREA_CHOICES} change={handleState} otherChange={handleOtherState}
-          state={state.activity} name="activity" error={state.errors.activity} otherValue={state.otherFields.activity} />
-        <Question value="Presentation(Appearance, dress code, body language)" change={handleState} name="presentation" error={state.errors.presentation} />
+          state={state.activity} name="activity" error={state.errors.activity} otherValue={state.otherFields.activity}
+          defaultVal={state.otherFields.activity} />
+        <Question value="Presentation(Appearance, dress code, body language)" change={handleState} name="presentation" error={state.errors.presentation}
+          defaultVal={state.presentation} />
         <Single question="Communication(Interaction with volunteers)" array={OPTIONS} change={handleState} otherChange={handleOtherState}
-          state={state.communication} name="communication" error={state.errors.communucation} otherValue={state.otherFields.communication} />
+          state={state.communication} name="communication" error={state.errors.communucation} otherValue={state.otherFields.communication}
+          defaultVal={state.otherFields.communication} />
         <Single question="Physical fitness(Are they able to stretch themselves)" array={OPTIONS} change={handleState} otherChange={handleOtherState}
-          state={state.fitness} name="fitness" error={state.errors.fitness} otherValue={state.otherFields.fitness} />
+          state={state.fitness} name="fitness" error={state.errors.fitness} otherValue={state.otherFields.fitness}
+          defaultVal={state.otherFields.fitness} />
         <Single question="Commitment and willingness towards activity" array={OPTIONS} change={handleState} otherChange={handleOtherState}
-          state={state.commitment} name="commitment" error={state.errors.commitment} otherValue={state.otherFields.commitment} />
+          state={state.commitment} name="commitment" error={state.errors.commitment} otherValue={state.otherFields.commitment}
+          defaultVal={state.otherFields.commitment} />
         <Single question="Remarks" array={REMARKS} change={handleState} otherChange={handleOtherState}
-          state={state.remarks} name="remarks" error={state.errors.remarks} otherValue={state.otherFields.remarks} />
+          state={state.remarks} name="remarks" error={state.errors.remarks} otherValue={state.otherFields.remarks}
+          defaultVal={state.other} />
         <Single question="If they can be trained which Area of activity do you think they will fit best?" array={AREA_CHOICES} change={handleState}
           state={state.train} name="train" error={state.errors.train} otherValue={state.otherFields.train} otherChange={handleOtherState} />
-        <Question value="Overall Feedback" change={handleState} name="overall" error={state.errors.overall} />
+        <Question value="Overall Feedback" change={handleState} name="overall" error={state.errors.overall}
+          defaultVal={state.overall} />
         <Grid item xs={12} sm={8} md={6} lg={12}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: 550, mx: "auto" }}>
-            <Button variant="contained" onClick={handleSubmit} sx={{ fontsize: '0.75rem' }}>Submit</Button>
-            <Button variant="text" sx={{ fontsize: '0.75rem' }}>Clear Form</Button>
-          </Stack>
+          {toUpdate ?
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: 550, mx: "auto" }}>
+              <Button variant="contained" onClick={handleUpdate} sx={{ fontsize: '0.75rem' }}>Update</Button>
+              <Button variant="text" sx={{ fontsize: '0.75rem' }}>Clear Form</Button>
+            </Stack>
+            :
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: 550, mx: "auto" }}>
+              <Button variant="contained" onClick={handleSubmit} sx={{ fontsize: '0.75rem' }}>Submit</Button>
+              <Button variant="text" sx={{ fontsize: '0.75rem' }}>Clear Form</Button>
+            </Stack>
+          }
         </Grid>
 
       </Grid>
@@ -185,7 +255,7 @@ function AddPVFeedback({ viewUpdate, otherInfo, toUpdate }) {
 }
 
 
-function Single({ question, array, change, state, name, error, otherValue, otherChange }) {
+function Single({ question, array, change, state, name, error, otherValue, otherChange, defaultVal }) {
   return (
     <Grid item xs={12} sm={8} md={6} lg={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
@@ -210,7 +280,8 @@ function Single({ question, array, change, state, name, error, otherValue, other
             {state === 'Other' ? <TextField label="Other" variant="standard" sx={{ width: 500 }}
               name={name}
               onChange={otherChange}
-              value={otherValue}
+              value={defaultVal ? defaultVal : otherValue}
+              InputLabelProps={{ shrink: true }}
             /> : <></>}
           </FormControl>
         </CardContent>

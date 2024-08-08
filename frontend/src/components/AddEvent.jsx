@@ -5,7 +5,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 
 
-function AddEvent({ open, setOpen, setEvents, handleClose }) {
+function AddEvent({ open, setOpen, setEvents, handleClose, setEventAdded }) {
   const [name, setName] = useState('Bhava Spandana');
   const [date, setDate] = useState(dayjs());
   const [programCoordinator, setProgramCoordinator] = useState();
@@ -51,6 +51,7 @@ function AddEvent({ open, setOpen, setEvents, handleClose }) {
       }
     }).then((resp) => {
       handleClose();
+      setEventAdded(true);
       setEvents((preEvent) => [...preEvent, resp.data.event]);
     })
   }

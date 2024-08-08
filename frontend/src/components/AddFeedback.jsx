@@ -103,7 +103,7 @@ function AddFeedback({ viewFeedback, otherInfo, toUpdate }) {
         overall: viewFeedback.training.overall || prevState.overall,
         remarks: viewFeedback.training.remarks || prevState.remarks,
         status: viewFeedback.training.status || prevState.status,
-        recommendation: viewFeedback.training.status || prevState.recommendation
+        recommendation: viewFeedback.training.recommendation || prevState.recommendation
       }));
     }
   }, [viewFeedback])

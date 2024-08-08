@@ -30,7 +30,6 @@ function Event() {
 
   const handleClose = () => {
     setOpen(false);
-    setEventAdded(true);
   };
   const handleOpen = () => {
     setOpen(true);
@@ -50,7 +49,7 @@ function Event() {
       <Stack direction="row" spacing={2} alignItems="center" sx={{ marginTop: 2, marginRight: 1 }}>
         <TextField id="filled-basic" label="Search Event" variant="filled" fullWidth />
         <AddIcon variant="outlined" onClick={handleOpen} fontSize='medium' ></AddIcon>
-        {open ? <AddEvent open={open} setOpen={setOpen} setEvents={setEvents} handleClose={handleClose} /> : <></>}
+        {open ? <AddEvent open={open} setOpen={setOpen} setEvents={setEvents} handleClose={handleClose} setEventAdded={setEventAdded} /> : <></>}
 
       </Stack>
       <Stack direction="row" spacing={2} sx={{ marginTop: 2, display: "flex", flexWrap: "wrap", justifyContent: "center" }}>

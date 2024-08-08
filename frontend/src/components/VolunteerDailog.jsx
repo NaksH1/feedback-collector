@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material/styles';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Paper, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useMediaQuery, Stack } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Paper, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useMediaQuery, Stack, Tooltip, IconButton, Snackbar } from "@mui/material";
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -16,8 +16,10 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
     setOpen(false);
   }
   const [feedbacks, setFeedbacks] = useState([]);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletedFeedbackId, setDeletedFeedbackId] = useState();
   useEffect(() => {
-    console.log(volunteer);
+    // console.log(volunteer);
     axios({
       method: "get",
       url: `http://localhost:3000/feedback/${volunteer.volunteerId._id}`,
@@ -38,7 +40,6 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
 
   const feedbackExist = () => {
     const exist = feedbacks.find(f => (f.eventId === event._id));
-    console.log(exist);
     return Boolean(exist);
   }
   const formatDate = (date) => {
@@ -48,6 +49,52 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
   }
   const viewFeedback = (feedbackId) => {
     navigate(`/viewfeedback/${feedbackId}`);
+  }
+  const deleteFeedback = async (feedbackId) => {
+    try {
+      const resp = await axios({
+        method: 'delete',
+        url: `http://localhost:3000/feedback/${feedbackId}`,
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem('token')
+        }
+      });
+      console.log(resp.data);
+      setFeedbacks(feedbacks.filter(feedback => (feedback._id !== feedbackId)));
+      setDeletedFeedbackId(feedbackId);
+      setDeleteOpen(true);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  const handleDeleteClose = (event, reason) => {
+    if (reason === 'clickaway')
+      return;
+    setDeleteOpen(false);
+  }
+  const handleDeleteRestore = async () => {
+    try {
+      const resp = await axios({
+        method: 'put',
+        url: `http://localhost:3000/feedback/recover/${deletedFeedbackId}`,
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("token")
+        }
+      })
+      const restored = await axios({
+        method: 'get',
+        url: `http://localhost:3000/feedback/full/${deletedFeedbackId}`,
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem('token')
+        }
+      });
+      console.log(restored.data);
+      setFeedbacks([...feedbacks, restored.data.feedback]);
+      setDeleteOpen(false);
+    }
+    catch (err) {
+      console.log(err);
+    }
   }
   return (
     <>
@@ -91,14 +138,22 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                       >
                         <TableCell >
-                          <VisibilityIcon onClick={() => viewFeedback(row._id)} />
-                          <DeleteOutlineIcon />
+                          <Tooltip title="View">
+                            <IconButton>
+                              <VisibilityIcon onClick={() => viewFeedback(row._id)} />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete">
+                            <IconButton>
+                              <DeleteOutlineIcon onClick={() => deleteFeedback(row._id)} />
+                            </IconButton>
+                          </Tooltip>
                         </TableCell>
                         <TableCell component="th" scope="row">
-                          {row.eventName}
+                          {row.eventId.name}
                         </TableCell>
-                        <TableCell>{formatDate(row.eventDate)}</TableCell>
-                        <TableCell>{row.givenBy}</TableCell>
+                        <TableCell>{formatDate(row.eventId.date)}</TableCell>
+                        <TableCell>{row.givenBy.name}</TableCell>
 
                       </TableRow>
                     ))}
@@ -116,7 +171,16 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
             Close
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog >
+      <Snackbar
+        open={deleteOpen}
+        autoHideDuration={6000}
+        onClose={handleDeleteClose}
+        message="Feedback Deleted"
+        action={<Button variant='text' size='small' onClick={handleDeleteRestore}>
+          UNDO
+        </Button>}
+      />
     </>
   )
 }
