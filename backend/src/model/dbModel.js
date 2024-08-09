@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { options } = require('../routes/feedbackRoutes');
 
 mongoose.connect('mongodb+srv://nakshsinghhh1:CNP2DaBXwJLf5ZYC@demo.vlottuc.mongodb.net/', {
   useNewUrlParser: true,
@@ -37,64 +38,78 @@ const volunteerSchema = new mongoose.Schema({
   feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }]
 });
 
+const optionSchema = new mongoose.Schema({
+  name: String,
+  selected: { type: Boolean, default: false }
+})
+
+const questionnaireSchema = new mongoose.Schema({
+  question: String,
+  answer: String,
+  type: { type: String, enums: ['single-choice', 'multiple-choice', 'long-answer'] },
+  options: [optionSchema]
+})
+
 const potentialSchema = new mongoose.Schema({
   remarks: String,
   status: String,
   recommendation: String
 });
 
-const choiceSchema = new mongoose.Schema({
-  choice1: { type: Boolean, default: false },
-  choice2: { type: Boolean, default: false },
-  choice3: { type: Boolean, default: false },
-  choice4: { type: Boolean, default: false },
-  choice5: { type: Boolean, default: false },
-  choice6: { type: Boolean, default: false },
-  choice7: { type: Boolean, default: false },
-  choice8: { type: Boolean, default: false },
-  choice9: { type: Boolean, default: false },
-  choice10: { type: Boolean, default: false }
-});
-
-const availableSchema = new mongoose.Schema({
-  achoice1: { type: Boolean, default: false },
-  achoice2: { type: Boolean, default: false },
-  achoice3: { type: Boolean, default: false },
-  achoice4: { type: Boolean, default: false },
-  achoice5: { type: Boolean, default: false },
-  achoice6: { type: Boolean, default: false }
-});
+// const choiceSchema = new mongoose.Schema({
+//   choice1: { type: Boolean, default: false },
+//   choice2: { type: Boolean, default: false },
+//   choice3: { type: Boolean, default: false },
+//   choice4: { type: Boolean, default: false },
+//   choice5: { type: Boolean, default: false },
+//   choice6: { type: Boolean, default: false },
+//   choice7: { type: Boolean, default: false },
+//   choice8: { type: Boolean, default: false },
+//   choice9: { type: Boolean, default: false },
+//   choice10: { type: Boolean, default: false }
+// });
+//
+// const availableSchema = new mongoose.Schema({
+//   achoice1: { type: Boolean, default: false },
+//   achoice2: { type: Boolean, default: false },
+//   achoice3: { type: Boolean, default: false },
+//   achoice4: { type: Boolean, default: false },
+//   achoice5: { type: Boolean, default: false },
+//   achoice6: { type: Boolean, default: false }
+// });
 
 const trainingSchema = new mongoose.Schema({
-  areas: choiceSchema,
-  activity: String,
-  comment1: String,
-  communicate: String,
-  comment2: String,
-  assign: String,
-  comment3: String,
-  listen: String,
-  comment4: String,
-  stretch: String,
-  comment5: String,
-  available: availableSchema,
-  others: String,
-  comment6: String,
-  overall: String,
-  remarks: String,
+  questionnaire: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Questionnaire' }],
+  // areas: choiceSchema,
+  // activity: String,
+  // comment1: String,
+  // communicate: String,
+  // comment2: String,
+  // assign: String,
+  // comment3: String,
+  // listen: String,
+  // comment4: String,
+  // stretch: String,
+  // comment5: String,
+  // available: availableSchema,
+  // others: String,
+  // comment6: String,
+  // overall: String,
+  // remarks: String,
   status: String,
   recommendation: String
 });
 
 const programVolunteerSchema = new mongoose.Schema({
-  activity: String,
-  presentation: String,
-  communication: String,
-  fitness: String,
-  commitment: String,
-  remarks: String,
-  train: String,
-  overall: String,
+  questionnaire: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Questionnaire' }],
+  // activity: String,
+  // presentation: String,
+  // communication: String,
+  // fitness: String,
+  // commitment: String,
+  // remarks: String,
+  // train: String,
+  // overall: String,
   status: String,
   recommendation: String
 })
@@ -152,11 +167,13 @@ const User = mongoose.model('User', userSchema);
 const Event = mongoose.model('Event', eventSchema);
 const Volunteer = mongoose.model('Volunteer', volunteerSchema);
 const Feedback = mongoose.model('Feedback', feedbackSchema);
+const Questionnaire = mongoose.model('Questionnaire', questionnaireSchema);
 
 module.exports = {
   Admin,
   User,
   Event,
   Volunteer,
-  Feedback
+  Feedback,
+  Questionnaire
 };

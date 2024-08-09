@@ -5,6 +5,7 @@ const Event = model.Event;
 const Volunteer = model.Volunteer;
 const Feedback = model.Feedback;
 const authenticateJwt = require('../middlewares/authentication');
+const { predefinedTrainingQuestions, predefinedProgramVolunteerQuestions } = require('../model/initQuestions');
 
 router.post('/', authenticateJwt, async (req, res) => {
   const { volunteerId, eventId } = req.body;
@@ -88,5 +89,100 @@ router.put('/recover/:feedbackId', authenticateJwt, async (req, res) => {
   res.status(200).json({ message: "Feedback recovered", feedback: feedback });
 
 })
+
+router.get('/questions/:type', authenticateJwt, async (req, res) => {
+  const type = req.params.type;
+  let questions;
+  switch (type) {
+    case 'training':
+      questions = await Questionnaire.find({ question: { $in: predefinedTrainingQuestions.map(q => q.question) } });
+      break;
+    case 'programVolunteer':
+      questions = await Questionnaire.find({ question: { $in: predefinedProgramVolunteerQuestions.map(q => q.question) } });
+      break;
+    default:
+      return res.status(400).json({ message: "Feedback type not found" });
+  }
+
+  res.json({ questions: questions });
+});
+
+const createClonedFeedback = async (feedbackData) => {
+  try {
+    const { type, volunteerId, eventId, adminId } = feedbackData;
+    let originalQuestions;
+    switch (type) {
+      case 'training':
+        originalQuestions = await Questionnaire.find({ question: { $in: predefinedTrainingQuestions.map(q => q.question) } });
+        break;
+      case 'programVolunteer':
+        originalQuestions = await Questionnaire.find({ question: { $in: predefinedProgramVolunteerQuestions.map(q => q.question) } });
+        break;
+      default:
+        return res.status(400).json({ message: 'Feedback type not found' });
+    }
+    const idMapping = {};
+    const clonedQuestions = await Promise.all(originalQuestions.map(async (question) => {
+      const clonedQuestion = question.toObject();
+      const originalId = clonedQuestion._id.toString();
+      delete clonedQuestion._id;
+      const newQuestion = await Questionnaire.create(clonedQuestion);
+      idMapping[originalId] = newQuestion._id.toString();
+      return newQuestion;
+    }));
+    const newFeedback = new Feedback({
+      eventId, volunteerId, givenBy: adminId, type,
+      [type]: { questionnaire: clonedQuestions.map(q => q._id) }
+    });
+
+    await newFeedback.save();
+    return { idMapping, newFeedback };
+  }
+  catch (error) {
+    throw new Error('Failed to create feedback with cloned questions: ' + error.message);
+  }
+}
+
+router.post('/create', authenticateJwt, async (req, res) => {
+  const { eventId, volunteerId, type, answers } = req.body;
+  const adminId = req.user.id;
+  const volunteer = await Volunteer.findById(volunteerId);
+  try {
+    const { idMapping, newFeedback } = await createClonedFeedback({ eventId, volunteerId, type, adminId });
+
+    for (const answer of answers) {
+      const clonedQuestionId = idMapping[answer.questionId];
+      const question = await Questionnaire.findById(clonedQuestionId);
+      if (!question) {
+        throw new Error(`Question not found for ${clonedQuestionId}`);
+      }
+      if (question.type === 'multiple-choice') {
+        question.options.forEach((option) => {
+          option.selected = answer.selectedOptions.includes(option.name);
+        });
+      } else if (question.type === 'single-choice') {
+        question.options.forEach((option) => {
+          if (option.name === selectedOptions[0]) {
+            option.selected = true;
+            if (option.name === 'Other')
+              question.answer = answer.answer;
+          }
+        });
+      } else if (question.type === 'long-answer') {
+        question.answer = answer.answer;
+      }
+      await question.save();
+    }
+    volunteer.feedbacks.push(newFeedback);
+    await volunteer.save();
+    res.status(201).json({ message: "Feedback updated successfully", feedback: newFeedback });
+  }
+  catch (error) {
+    res.status(500).json({ error: "Error while submitting feedback" + error.message });
+  }
+});
+
+
+
 module.exports = router;
 
