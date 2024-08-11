@@ -4,8 +4,9 @@ const model = require('../model/dbModel');
 const Event = model.Event;
 const Volunteer = model.Volunteer;
 const Feedback = model.Feedback;
+const Questionnaire = model.Questionnaire;
 const authenticateJwt = require('../middlewares/authentication');
-const { predefinedTrainingQuestions, predefinedProgramVolunteerQuestions } = require('../model/initQuestions');
+const { predefinedTrainingQuestions, predefinedProgramVolunteerQuestions, trainingQuestionsId, programVolunteerQuestionsId } = require('../model/initQuestions');
 
 router.post('/', authenticateJwt, async (req, res) => {
   const { volunteerId, eventId } = req.body;
@@ -92,13 +93,14 @@ router.put('/recover/:feedbackId', authenticateJwt, async (req, res) => {
 
 router.get('/questions/:type', authenticateJwt, async (req, res) => {
   const type = req.params.type;
+  console.log('type', type);
   let questions;
   switch (type) {
     case 'training':
-      questions = await Questionnaire.find({ question: { $in: predefinedTrainingQuestions.map(q => q.question) } });
+      questions = await Questionnaire.find({ _id: { $in: trainingQuestionsId } });
       break;
     case 'programVolunteer':
-      questions = await Questionnaire.find({ question: { $in: predefinedProgramVolunteerQuestions.map(q => q.question) } });
+      questions = await Questionnaire.find({ _id: { $in: programVolunteerQuestionsId } });
       break;
     default:
       return res.status(400).json({ message: "Feedback type not found" });
@@ -113,10 +115,10 @@ const createClonedFeedback = async (feedbackData) => {
     let originalQuestions;
     switch (type) {
       case 'training':
-        originalQuestions = await Questionnaire.find({ question: { $in: predefinedTrainingQuestions.map(q => q.question) } });
+        originalQuestions = await Questionnaire.find({ _id: { $in: trainingQuestionsId } });
         break;
       case 'programVolunteer':
-        originalQuestions = await Questionnaire.find({ question: { $in: predefinedProgramVolunteerQuestions.map(q => q.question) } });
+        originalQuestions = await Questionnaire.find({ _id: { $in: programVolunteerQuestionsId } });
         break;
       default:
         return res.status(400).json({ message: 'Feedback type not found' });
@@ -149,7 +151,6 @@ router.post('/create', authenticateJwt, async (req, res) => {
   const volunteer = await Volunteer.findById(volunteerId);
   try {
     const { idMapping, newFeedback } = await createClonedFeedback({ eventId, volunteerId, type, adminId });
-
     for (const answer of answers) {
       const clonedQuestionId = idMapping[answer.questionId];
       const question = await Questionnaire.findById(clonedQuestionId);
@@ -162,7 +163,7 @@ router.post('/create', authenticateJwt, async (req, res) => {
         });
       } else if (question.type === 'single-choice') {
         question.options.forEach((option) => {
-          if (option.name === selectedOptions[0]) {
+          if (option.name === answer.selectedOptions[0]) {
             option.selected = true;
             if (option.name === 'Other')
               question.answer = answer.answer;
@@ -175,10 +176,10 @@ router.post('/create', authenticateJwt, async (req, res) => {
     }
     volunteer.feedbacks.push(newFeedback);
     await volunteer.save();
-    res.status(201).json({ message: "Feedback updated successfully", feedback: newFeedback });
+    res.status(201).json({ message: "Feedback submitted successfully", feedback: newFeedback });
   }
   catch (error) {
-    res.status(500).json({ error: "Error while submitting feedback" + error.message });
+    res.status(500).json({ error: "Error while submitting feedback " + error });
   }
 });
 

@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
-const { options } = require('../routes/feedbackRoutes');
 
-mongoose.connect('mongodb+srv://nakshsinghhh1:CNP2DaBXwJLf5ZYC@demo.vlottuc.mongodb.net/', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
-
+mongoose.connect('mongodb+srv://nakshsinghhh1:CNP2DaBXwJLf5ZYC@demo.vlottuc.mongodb.net/');
 const adminSchema = new mongoose.Schema({
   username: String,
   password: String,

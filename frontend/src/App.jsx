@@ -10,6 +10,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import AddPVFeedback from './components/AddPVFeedback.jsx';
 import ViewFeedback from './components/ViewFeedback.jsx';
+import AddTFeedback from './components/AddTFeedback.jsx';
 
 function App() {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ function App() {
               <Route path="/addfeedback" element={<AddFeedback />} />
               <Route path="/addpvfeedback" element={<AddPVFeedback />} />
               <Route path="/viewfeedback/:feedbackId" element={<ViewFeedback />} />
+              <Route path="/addtfeedback/" element={<AddTFeedback />} />
             </Routes>
           </AuthProvider>
         </LocalizationProvider>

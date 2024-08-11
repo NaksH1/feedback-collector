@@ -6,7 +6,8 @@ const eventRoutes = require('./src/routes/eventRoutes.js');
 const volunteerRoutes = require('./src/routes/volunteerRoutes.js');
 const feedbackRoutes = require('./src/routes/feedbackRoutes.js');
 const cors = require('cors');
-
+const { savePredefinedAndUpdate, loadQuestionsId, programVolunteerQuestionsId, trainingQuestionsId } = require('./src/model/initQuestions.js');
+const { Questionnaire, Feedback, connectDB, checkConnectionStatus } = require('./src/model/dbModel.js');
 app.use(cors());
 app.use(express.json());
 
@@ -33,4 +34,23 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 });
+
+const startServer = async (Questionnaire) => {
+  try {
+    const existingQuestionnaire = await Questionnaire.findOne({ question: 'How did they handle the activity?' });
+    if (!existingQuestionnaire) {
+      await savePredefinedAndUpdate(Questionnaire);
+      console.log('Predefined Questions saved');
+    }
+  }
+  catch (err) {
+    console.log('Failed to save predefined questions', err);
+  }
+}
+startServer(Questionnaire);
+
+loadQuestionsId(Questionnaire).then(() => {
+  console.log("Question Ids updated");
+})
+
 
