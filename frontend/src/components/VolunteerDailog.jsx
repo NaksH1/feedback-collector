@@ -33,7 +33,7 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
 
   function addFeedback(type) {
     if (type === 'training')
-      navigate('/addFeedback', { state: { volunteerName: volunteer.volunteerId.name, volunteerId: volunteer.volunteerId._id, event: event } })
+      navigate('/addtFeedback', { state: { volunteerName: volunteer.volunteerId.name, volunteerId: volunteer.volunteerId._id, event: event, type: 'training' } })
     else if (type === 'programVolunteer')
       navigate('/addpvfeedback', { state: { volunteerName: volunteer.volunteerId.name, volunteerId: volunteer.volunteerId._id, event: event } })
   }

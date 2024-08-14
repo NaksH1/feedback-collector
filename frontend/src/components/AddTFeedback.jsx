@@ -6,24 +6,105 @@ import dayjs from "dayjs";
 
 function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
   const location = useLocation();
-  // const { volunteerName, volunteerId, event } = location.state || otherInfo;
+  const { volunteerName, volunteerId, event, type } = location.state || otherInfo;
   const navigate = useNavigate();
-  const type = 'training';
-  const [state, setState] = useState();
+  const [questionnaire, setQuestionnaire] = useState();
+  const [feedbackState, setFeedbackState] = useState({});
   useEffect(() => {
     axios({
       method: 'get',
       url: `http://localhost:3000/feedback/questions/${type}`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem('token')
+      },
+      params: {
+        "volunteerId": volunteerId,
+        "eventId": event._id
       }
     }).then((resp) => {
-      console.log(resp.data);
+
+      setQuestionnaire(resp.data.feedback[type].questionnaire)
     });
-  })
+  }, []);
+  const formatDate = (date) => {
+    if (!date)
+      return '';
+    return dayjs(date).format('Do MMMM YYYY');
+  }
+  const handleChange = (e, questionId) => {
+    const { type, value, checked } = e.target;
+    if (type === 'checkbox') {
+      setFeedbackState((preFeedbackState) => {
+        const currentSelectedValues = feedbackState[questionId]?.selectedOptions || [];
+        return {
+          ...preFeedbackState,
+          [questionId]: {
+            selectedOptions: checked ?
+              [...currentSelectedValues, value] :
+              currentSelectedValues.filter(val => val !== value)
+          }
+        }
+      })
+    } else if (type === 'radio') {
+      setFeedbackState((preFeedbackState) => ({
+        ...preFeedbackState,
+        [questionId]: {
+          selectedOptions: [value]
+        }
+      }));
+    } else if (type === 'text') {
+      setFeedbackState((preFeedbackState) => ({
+        ...preFeedbackState,
+        [questionId]: {
+          answer: value
+        }
+      }))
+    }
+    console.log(feedbackState);
+  }
+
   return (
     <>
-      <span>Demo</span>
+      <Grid container spacing={1.5} justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
+        <Header volunteerName={volunteerName} eventName={event.name} eventDate={formatDate(event.date)} />
+        {questionnaire ?
+          questionnaire.map((questionObj) => {
+            if (questionObj.type === 'single-choice') {
+              return (
+                <SingleChoice
+                  key={questionObj._id}
+                  question={questionObj.question}
+                  options={questionObj.options}
+                  selectedOption={feedbackState[questionObj._id]?.selectedOptions[0] || ''}
+                  change={(e) => handleChange(e, questionObj._id)}
+                />
+              );
+            } else if (questionObj.type === 'multiple-choice') {
+              return (
+                <MultipleChoice
+                  key={questionObj._id}
+                  question={questionObj.question}
+                  options={questionObj.options}
+                  selectedOptions={feedbackState[questionObj._id]?.selectedOptions || []}
+                  change={(e) => handleChange(e, questionObj._id)}
+                />
+              )
+            } else if (questionObj.type === 'long-answer') {
+              return (
+                <Question
+                  key={questionObj._id}
+                  question={questionObj.question}
+                  change={(e) => handleChange(e, questionObj._id)}
+                  defaultVal={feedbackState[questionObj._id]?.answer || ''}
+                />
+              )
+            }
+            return null;
+          })
+          :
+          <span>Loading...</span>
+        }
+      </Grid>
     </>
   )
   {/* <> */ }
@@ -33,27 +114,6 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
   {/*     </Alert> */ }
   {/*   </Snackbar> */ }
   {/*   <Grid container spacing={1.5} justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}> */ }
-  {/*     <Grid item xs={12} sm={8} md={6} lg={12}> */ }
-  {/*       <Card sx={{ maxWidth: 550, mx: "auto" }}> */ }
-  {/*         <CardHeader */ }
-  {/*           title="Sadhguru Sahabhagi Trainees Feedback- Observation Phase" */ }
-  {/*         /> */ }
-  {/*         <Divider /> */ }
-  {/*         <CardContent> */ }
-  {/*           <Typography> */ }
-  {/*             Sadhguru Sahabhagi Name : {volunteerName} */ }
-  {/*           </Typography> */ }
-  {/*           <Stack direction="row" justifyContent="space-between"> */ }
-  {/*             <Typography variant="body2" component="div"> */ }
-  {/*               Event Name: {event.name} */ }
-  {/*             </Typography> */ }
-  {/*             <Typography variant="body2" component="div"> */ }
-  {/*               Date: {formatDate(event.date)} */ }
-  {/*             </Typography> */ }
-  {/*           </Stack> */ }
-  {/*         </CardContent> */ }
-  {/*       </Card> */ }
-  {/*     </Grid> */ }
   {/*     {toUpdate ? */ }
   {/*       <> */ }
   {/*         <Question value="Status" change={handleState} name="status" defaultVal={state.status} /> */ }
@@ -61,30 +121,6 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
   {/*       </> */ }
   {/*       : <></> */ }
   {/*     } */ }
-  {/*     <MultipleChoice question="Which area were they co-ordinating?" array={AREA_CHOICES} handleChoice={handleState} choices={state.areas} /> */ }
-  {/*     <SingleChoice question="How did they handle the activity?" array={HANDLE_ACTIVITY} change={handleState} */ }
-  {/*       state={state.activity} name="activity" error={state.errors.activity} /> */ }
-  {/*     <Question value="Could you elaborate?" change={handleState} name="comment1" error={state.errors.comment1} defaultVal={state.comment1} /> */ }
-  {/*     <SingleChoice question="Are they able to effectively communicate with volunteers, keep them together & get the activity done?" array={HANDLE_ACTIVITY} */ }
-  {/*       state={state.communicate} change={handleState} name="communicate" error={state.errors.communicate} /> */ }
-  {/*     <Question value="Could you elaborate?" change={handleState} name="comment2" error={state.errors.comment2} defaultVal={state.comment2} /> */ }
-  {/*     <SingleChoice question="Are they able to assign right activity to the right person?" array={ASSIGN_ACTIVITY} */ }
-  {/*       state={state.assign} change={handleState} name="assign" error={state.errors.assign} /> */ }
-  {/*     <Question value="Could you elaborate?" change={handleState} name="comment3" error={state.errors.comment3} defaultVal={state.comment3} /> */ }
-  {/*     <SingleChoice question="Are they willing to listen to the Organisers / Ishanga instructions and act in accordance with the same?" array={LISTEN} */ }
-  {/*       state={state.listen} change={handleState} name="listen" error={state.errors.listen} /> */ }
-  {/*     <Question value="Could you elaborate?" change={handleState} name="comment4" error={state.errors.comment5} defaultVal={state.comment4} /> */ }
-  {/*     <SingleChoice question="Are they able to stretch physically as per the program's requirement?" array={STRETCH} */ }
-  {/*       state={state.stretch} change={handleState} name="stretch" error={state.errors.stretch} /> */ }
-  {/*     <Question value="Could you elaborate?" change={handleState} name="comment5" error={state.errors.comment5} defaultVal={state.comment5} /> */ }
-  {/*     <MultipleChoice question="Are they committed to the program schedule & available for what is needed for the program?" array={AVAILABLE} */ }
-  {/*       handleChoice={handleState} choices={state.available} error={state.errors.available} /> */ }
-  {/*     <Question value="If Others please specify" change={handleState} name="others" error={state.errors.others} defaultVal={state.others} /> */ }
-  {/*     <Question value="Could you elaborate?" change={handleState} name="comment6" error={state.errors.comment6} defaultVal={state.comment6} /> */ }
-  {/*     <SingleChoice question="Overall Feedback" array={OVERALL} */ }
-  {/*       state={state.overall} change={handleState} name="overall" error={state.errors.overall} /> */ }
-  {/*     <Question value="Other Remarks (Anything else you'd like the training team to know.)" change={handleState} name="remarks" */ }
-  {/*       error={state.errors.remarks} defaultVal={state.remarks} /> */ }
   {/*     <Grid item xs={12} sm={8} md={6} lg={12}> */ }
   {/*       {toUpdate ? */ }
   {/*         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: 550, mx: "auto" }}> */ }
@@ -105,16 +141,40 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
   {/* </> */ }
 }
 
-function Question({ value, change, name, error, defaultVal }) {
+function Header({ volunteerName, eventName, eventDate }) {
+  return (
+    <Grid item xs={12} sm={8} md={6} lg={12}>
+      <Card sx={{ maxWidth: 550, mx: "auto" }}>
+        <CardHeader
+          title="Sadhguru Sahabhagi Trainees Feedback - Observation Phase" />
+        <CardContent>
+          <Typography>
+            Sadhguru Sahabhagi Name : {volunteerName}
+          </Typography>
+          <Stack direction="row" justifyContent="space-between">
+            <Typography variant="body2" component="div">
+              Event name: {eventName}
+            </Typography>
+            <Typography variant="body2" component="div">
+              Date : {eventDate}
+            </Typography>
+          </Stack>
+        </CardContent>
+      </Card>
+    </Grid>
+  );
+}
+
+function Question({ question, change, error, defaultVal }) {
   return (
     <Grid item xs={12} sm={8} md={6} lg={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
         <CardContent sx={{ padding: 2 }}>
           <Stack direction="column" spacing={1}>
             <Typography variant="subtitle1">
-              {value}
+              {question}
             </Typography>
-            <TextField required label="Your answer" variant="standard" onChange={change} name={name}
+            <TextField required label="Your answer" variant="standard" onChange={change}
               error={error} helperText={error ? "This field is required" : ""}
               value={defaultVal ? defaultVal : ""} InputLabelProps={{ shrink: true }}></TextField>
           </Stack>
@@ -124,7 +184,7 @@ function Question({ value, change, name, error, defaultVal }) {
   )
 }
 
-function MultipleChoice({ question, array, handleChoice, choices }) {
+function MultipleChoice({ question, options, selectedOptions, change }) {
   return (
     <Grid item xs={12} sm={8} md={6} lg={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
@@ -136,15 +196,14 @@ function MultipleChoice({ question, array, handleChoice, choices }) {
             </Typography>
             <FormControl component="fieldset">
               <FormGroup>
-                {array.map((choice, index) => {
-                  return (
-                    <FormControlLabel key={index}
-                      control={<Checkbox checked={choices[`choice${index + 1}`]} onChange={handleChoice} name={`choice${index + 1}`} />}
-                      label={choice}
-                      sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.9rem' } }}
-                    />
-                  )
-                })}
+                {options.map((choice) => (
+                  <FormControlLabel key={choice._id}
+                    control={<Checkbox checked={selectedOptions.includes(choice.name)} onChange={change} name={choice.name} value={choice.name} />}
+                    label={choice.name}
+                    sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.9rem' } }}
+                  />
+                )
+                )}
               </FormGroup>
             </FormControl>
           </Stack>
@@ -154,7 +213,7 @@ function MultipleChoice({ question, array, handleChoice, choices }) {
 
   )
 }
-function SingleChoice({ question, array, change, state, name, error }) {
+function SingleChoice({ question, options, selectedOption, change, error }) {
   return (
     <Grid item xs={12} sm={8} md={6} lg={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
@@ -163,15 +222,15 @@ function SingleChoice({ question, array, change, state, name, error }) {
             {question}
           </Typography>
           <FormControl component="fieldset" error={error}>
-            <RadioGroup aria-label="choices" name={name} value={state} onChange={change}>
-              {array.map((choice, index) => {
+            <RadioGroup aria-label="choices" name={question} value={selectedOption} onChange={change}>
+              {options.map((choice) => {
                 return (
                   <FormControlLabel
-                    key={index}
-                    value={choice}
+                    key={choice._id}
+                    value={choice.name}
                     control={<Radio />}
                     sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.9rem' } }}
-                    label={choice} />
+                    label={choice.name} />
                 )
               })}
             </RadioGroup>

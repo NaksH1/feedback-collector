@@ -34,21 +34,6 @@ router.get('/full/:feedbackId', authenticateJwt, async (req, res) => {
   else
     res.json(404).json({ message: "feedback not found" });
 })
-router.get('/:volunteerId', authenticateJwt, async (req, res) => {
-  const volunteer = await Volunteer.findById({ _id: req.params.volunteerId }).populate({
-    path: 'feedbacks',
-    match: { deleted_at: { $eq: null } },
-    populate: [
-      { path: 'eventId', select: 'name date' },
-      { path: 'givenBy', select: 'name' }
-    ]
-  }).exec();
-  if (volunteer) {
-    res.json({ feedbacks: volunteer.feedbacks || [] });
-  }
-  else
-    res.status(404).json({ message: "Volunteer not found" });
-});
 
 router.get('/view/:feedbackId', authenticateJwt, async (req, res) => {
   const feedback = await Feedback.findById(req.params.feedbackId).populate([
@@ -91,96 +76,117 @@ router.put('/recover/:feedbackId', authenticateJwt, async (req, res) => {
 
 })
 
-router.get('/questions/:type', authenticateJwt, async (req, res) => {
-  const type = req.params.type;
-  console.log('type', type);
-  let questions;
-  switch (type) {
-    case 'training':
-      questions = await Questionnaire.find({ _id: { $in: trainingQuestionsId } });
-      break;
-    case 'programVolunteer':
-      questions = await Questionnaire.find({ _id: { $in: programVolunteerQuestionsId } });
-      break;
-    default:
-      return res.status(400).json({ message: "Feedback type not found" });
-  }
-
-  res.json({ questions: questions });
-});
-
 const createClonedFeedback = async (feedbackData) => {
   try {
-    const { type, volunteerId, eventId, adminId } = feedbackData;
+    const { type, volunteerId, eventId } = feedbackData;
     let originalQuestions;
-    switch (type) {
-      case 'training':
-        originalQuestions = await Questionnaire.find({ _id: { $in: trainingQuestionsId } });
-        break;
-      case 'programVolunteer':
-        originalQuestions = await Questionnaire.find({ _id: { $in: programVolunteerQuestionsId } });
-        break;
-      default:
-        return res.status(400).json({ message: 'Feedback type not found' });
-    }
-    const idMapping = {};
+    if (type === 'training')
+      originalQuestions = await Questionnaire.find({ _id: { $in: trainingQuestionsId } });
+    else if (type === 'programVolunteer')
+      originalQuestions = await Questionnaire.find({ _id: { $in: programVolunteerQuestionsId } });
+    else
+      throw new Error('Feedback type not found');
+
+    // const idMapping = {};
     const clonedQuestions = await Promise.all(originalQuestions.map(async (question) => {
       const clonedQuestion = question.toObject();
-      const originalId = clonedQuestion._id.toString();
+      // const originalId = clonedQuestion._id.toString();
       delete clonedQuestion._id;
       const newQuestion = await Questionnaire.create(clonedQuestion);
-      idMapping[originalId] = newQuestion._id.toString();
+      // idMapping[originalId] = newQuestion._id.toString();
       return newQuestion;
     }));
     const newFeedback = new Feedback({
-      eventId, volunteerId, givenBy: adminId, type,
+      eventId, volunteerId, type,
       [type]: { questionnaire: clonedQuestions.map(q => q._id) }
     });
 
     await newFeedback.save();
-    return { idMapping, newFeedback };
+    return newFeedback;
   }
   catch (error) {
     throw new Error('Failed to create feedback with cloned questions: ' + error.message);
   }
 }
 
-router.post('/create', authenticateJwt, async (req, res) => {
-  const { eventId, volunteerId, type, answers } = req.body;
-  const adminId = req.user.id;
-  const volunteer = await Volunteer.findById(volunteerId);
-  try {
-    const { idMapping, newFeedback } = await createClonedFeedback({ eventId, volunteerId, type, adminId });
-    for (const answer of answers) {
-      const clonedQuestionId = idMapping[answer.questionId];
-      const question = await Questionnaire.findById(clonedQuestionId);
-      if (!question) {
-        throw new Error(`Question not found for ${clonedQuestionId}`);
+router.get('/questions/:type', authenticateJwt, async (req, res) => {
+  const type = req.params.type;
+  const { volunteerId, eventId } = req.query;
+  const feedback = await Feedback.findOne({ eventId: eventId, volunteerId: volunteerId });
+  if (!feedback) {
+    try {
+      const newFeedback = await createClonedFeedback({ type, volunteerId, eventId });
+      console.log(newFeedback)
+      await newFeedback.populate({ path: `${type}.questionnaire` });
+      if (newFeedback) {
+        res.status(200).json({ questionnaire: newFeedback[type].questionnaire });
       }
+      else {
+        res.status(404).json({ message: "Questionnaire not found" });
+      }
+    }
+    catch (err) {
+      console.log("Error while cloning questions : " + err);
+    }
+  } else {
+    await feedback.populate({ path: `${type}.questionnaire` });
+    res.json({ feedback: feedback });
+  }
+});
+
+router.post('/create', authenticateJwt, async (req, res) => {
+  const { eventId, volunteerId, answers } = req.body;
+  const feedback = Feedback.findOne({ eventId: eventId, volunteerId: volunteerId });
+  const volunteer = Volunteer.findById(volunteerId);
+  if (feedback) {
+    //feedback submit logic
+    const adminId = req.user.id;
+    for (const answer of answers) {
+      const question = await Questionnaire.findById(answer.questionId);
+      if (!question)
+        throw new Error(`Question not found for ${answer.questionId}`);
       if (question.type === 'multiple-choice') {
         question.options.forEach((option) => {
           option.selected = answer.selectedOptions.includes(option.name);
         });
-      } else if (question.type === 'single-choice') {
+      }
+      else if (question.type === 'single-choice') {
         question.options.forEach((option) => {
-          if (option.name === answer.selectedOptions[0]) {
+          if (option.name === selectedOptions[0]) {
             option.selected = true;
             if (option.name === 'Other')
               question.answer = answer.answer;
           }
         });
-      } else if (question.type === 'long-answer') {
-        question.answer = answer.answer;
       }
-      await question.save();
+      else if (question.type === 'long-answer') {
+        question.answer = question.answer;
+      }
     }
-    volunteer.feedbacks.push(newFeedback);
+    feedback.givenBy = adminId;
+    volunteer.push(feedback._id);
     await volunteer.save();
-    res.status(201).json({ message: "Feedback submitted successfully", feedback: newFeedback });
+    res.status(201).json({ message: "feedback submitted", feedback: feedback });
   }
-  catch (error) {
-    res.status(500).json({ error: "Error while submitting feedback " + error });
+  else {
+    res.status(500).json({ error: "Error while submitting the feedback" });
   }
+});
+
+router.get('/:volunteerId', authenticateJwt, async (req, res) => {
+  const volunteer = await Volunteer.findById({ _id: req.params.volunteerId }).populate({
+    path: 'feedbacks',
+    match: { deleted_at: { $eq: null } },
+    populate: [
+      { path: 'eventId', select: 'name date' },
+      { path: 'givenBy', select: 'name' }
+    ]
+  }).exec();
+  if (volunteer) {
+    res.json({ feedbacks: volunteer.feedbacks || [] });
+  }
+  else
+    res.status(404).json({ message: "Volunteer not found" });
 });
 
 
