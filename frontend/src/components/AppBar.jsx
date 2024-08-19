@@ -37,6 +37,9 @@ function Appbar() {
   function navigateEvent() {
     navigate('./events');
   }
+  function navigateDashboard() {
+    navigate('./volunteerdashboard');
+  }
   return (
     <>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -45,7 +48,7 @@ function Appbar() {
             Feedback-Collector
           </Typography>
           <Button variant="text" onClick={() => navigateEvent()}>EVENTS</Button>
-
+          <Button variant="text" onClick={() => navigateDashboard()}>VOLUNTEER</Button>
         </Stack>
         {isLoggedIn ? (
           <Stack direction="row" alignItems="center">

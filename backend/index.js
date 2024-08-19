@@ -6,8 +6,8 @@ const eventRoutes = require('./src/routes/eventRoutes.js');
 const volunteerRoutes = require('./src/routes/volunteerRoutes.js');
 const feedbackRoutes = require('./src/routes/feedbackRoutes.js');
 const cors = require('cors');
-const { savePredefinedAndUpdate, loadQuestionsId, programVolunteerQuestionsId, trainingQuestionsId } = require('./src/model/initQuestions.js');
-const { Questionnaire, Feedback, connectDB, checkConnectionStatus } = require('./src/model/dbModel.js');
+const { savePredefinedAndUpdate, loadQuestionsId } = require('./src/model/initQuestions.js');
+const { Questionnaire } = require('./src/model/dbModel.js');
 app.use(cors());
 app.use(express.json());
 
@@ -26,6 +26,9 @@ app.use('/volunteer', volunteerRoutes);
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   console.error(err.message, err.stack);
+  if (res.headerSent) {
+    return next(err);
+  }
   res.status(statusCode).json({ message: err.message });
 
   return;

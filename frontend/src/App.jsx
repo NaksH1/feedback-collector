@@ -11,6 +11,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import AddPVFeedback from './components/AddPVFeedback.jsx';
 import ViewFeedback from './components/ViewFeedback.jsx';
 import AddTFeedback from './components/AddTFeedback.jsx';
+import VolunteerDashboard from './components/VolunteersDashboard.jsx';
 
 function App() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ function App() {
               <Route path="/addpvfeedback" element={<AddPVFeedback />} />
               <Route path="/viewfeedback/:feedbackId" element={<ViewFeedback />} />
               <Route path="/addtfeedback/" element={<AddTFeedback />} />
+              <Route path="/volunteerdashboard" element={<VolunteerDashboard />} />
             </Routes>
           </AuthProvider>
         </LocalizationProvider>

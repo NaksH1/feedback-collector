@@ -51,60 +51,14 @@ const potentialSchema = new mongoose.Schema({
   recommendation: String
 });
 
-// const choiceSchema = new mongoose.Schema({
-//   choice1: { type: Boolean, default: false },
-//   choice2: { type: Boolean, default: false },
-//   choice3: { type: Boolean, default: false },
-//   choice4: { type: Boolean, default: false },
-//   choice5: { type: Boolean, default: false },
-//   choice6: { type: Boolean, default: false },
-//   choice7: { type: Boolean, default: false },
-//   choice8: { type: Boolean, default: false },
-//   choice9: { type: Boolean, default: false },
-//   choice10: { type: Boolean, default: false }
-// });
-//
-// const availableSchema = new mongoose.Schema({
-//   achoice1: { type: Boolean, default: false },
-//   achoice2: { type: Boolean, default: false },
-//   achoice3: { type: Boolean, default: false },
-//   achoice4: { type: Boolean, default: false },
-//   achoice5: { type: Boolean, default: false },
-//   achoice6: { type: Boolean, default: false }
-// });
-
 const trainingSchema = new mongoose.Schema({
   questionnaire: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Questionnaire' }],
-  // areas: choiceSchema,
-  // activity: String,
-  // comment1: String,
-  // communicate: String,
-  // comment2: String,
-  // assign: String,
-  // comment3: String,
-  // listen: String,
-  // comment4: String,
-  // stretch: String,
-  // comment5: String,
-  // available: availableSchema,
-  // others: String,
-  // comment6: String,
-  // overall: String,
-  // remarks: String,
   status: String,
   recommendation: String
 });
 
 const programVolunteerSchema = new mongoose.Schema({
   questionnaire: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Questionnaire' }],
-  // activity: String,
-  // presentation: String,
-  // communication: String,
-  // fitness: String,
-  // commitment: String,
-  // remarks: String,
-  // train: String,
-  // overall: String,
   status: String,
   recommendation: String
 })

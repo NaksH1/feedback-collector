@@ -10,6 +10,9 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
   const navigate = useNavigate();
   const [questionnaire, setQuestionnaire] = useState();
   const [feedbackState, setFeedbackState] = useState({});
+  const [errorState, setErrorState] = useState({});
+  const [errorFilling, setErrorFilling] = useState(false);
+
   useEffect(() => {
     axios({
       method: 'get',
@@ -22,49 +25,116 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
         "eventId": event._id
       }
     }).then((resp) => {
-
-      setQuestionnaire(resp.data.feedback[type].questionnaire)
+      setQuestionnaire(resp.data?.feedback[type].questionnaire);
     });
   }, []);
+
   const formatDate = (date) => {
-    if (!date)
-      return '';
+    if (!date) return '';
     return dayjs(date).format('Do MMMM YYYY');
   }
+
   const handleChange = (e, questionId) => {
     const { type, value, checked } = e.target;
-    if (type === 'checkbox') {
-      setFeedbackState((preFeedbackState) => {
-        const currentSelectedValues = feedbackState[questionId]?.selectedOptions || [];
+
+    setFeedbackState((prevState) => {
+      if (type === 'checkbox') {
+        const currentSelectedValues = prevState[questionId]?.selectedOptions || [];
         return {
-          ...preFeedbackState,
+          ...prevState,
           [questionId]: {
             selectedOptions: checked ?
               [...currentSelectedValues, value] :
               currentSelectedValues.filter(val => val !== value)
           }
+        };
+      } else if (type === 'radio') {
+        return {
+          ...prevState,
+          [questionId]: {
+            selectedOptions: [value]
+          }
+        };
+      } else if (type === 'text') {
+        return {
+          ...prevState,
+          [questionId]: {
+            answer: value
+          }
+        };
+      }
+    });
+  }
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrorState = {};
+
+    questionnaire.forEach((questionObj) => {
+      if (questionObj.type === 'multiple-choice' || questionObj.type === 'single-choice') {
+        if (!feedbackState[questionObj._id] || feedbackState[questionObj._id].selectedOptions.length === 0) {
+          newErrorState[questionObj._id] = true;
+          isValid = false;
         }
-      })
-    } else if (type === 'radio') {
-      setFeedbackState((preFeedbackState) => ({
-        ...preFeedbackState,
-        [questionId]: {
-          selectedOptions: [value]
+      } else if (questionObj.type === 'long-answer') {
+        if (!feedbackState[questionObj._id] || !feedbackState[questionObj._id].answer) {
+          newErrorState[questionObj._id] = true;
+          isValid = false;
         }
-      }));
-    } else if (type === 'text') {
-      setFeedbackState((preFeedbackState) => ({
-        ...preFeedbackState,
-        [questionId]: {
-          answer: value
-        }
-      }))
+      }
+    });
+
+    setErrorState(newErrorState);
+    return isValid;
+  }
+
+  const handleSubmit = async () => {
+    if (validateForm()) {
+      const answers = [];
+      for (const [index, [key, value]] of Object.entries(Object.entries(feedbackState))) {
+        answers.push({
+          questionId: key,
+          selectedOptions: value.selectedOptions,
+          answer: value.answer
+        })
+      }
+      try {
+        const resp = await axios({
+          method: 'post',
+          url: 'http://localhost:3000/feedback/create',
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          },
+          data: {
+            volunteerId: volunteerId,
+            eventId: event._id,
+            answers: answers
+          }
+        });
+        console.log('Feeback Submitted', resp.data);
+        alert('Feedback Submitted');
+        navigate(`/events/${event._id}`);
+      }
+      catch (err) {
+        console.log('Error while submitting ' + err);
+      }
+    } else {
+      setErrorFilling(true);
     }
-    console.log(feedbackState);
+  }
+
+  const handleAlertClose = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setErrorFilling(false);
   }
 
   return (
     <>
+      <Snackbar open={errorFilling} autoHideDuration={6000} onClose={handleAlertClose}>
+        <Alert onClose={handleAlertClose} severity="error" variant="filled" sx={{ width: '100%' }}>
+          Please fill all the required fields
+        </Alert>
+      </Snackbar>
       <Grid container spacing={1.5} justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
         <Header volunteerName={volunteerName} eventName={event.name} eventDate={formatDate(event.date)} />
         {questionnaire ?
@@ -77,6 +147,7 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
                   options={questionObj.options}
                   selectedOption={feedbackState[questionObj._id]?.selectedOptions[0] || ''}
                   change={(e) => handleChange(e, questionObj._id)}
+                  error={errorState[questionObj._id]}
                 />
               );
             } else if (questionObj.type === 'multiple-choice') {
@@ -87,8 +158,9 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
                   options={questionObj.options}
                   selectedOptions={feedbackState[questionObj._id]?.selectedOptions || []}
                   change={(e) => handleChange(e, questionObj._id)}
+                  error={errorState[questionObj._id]}
                 />
-              )
+              );
             } else if (questionObj.type === 'long-answer') {
               return (
                 <Question
@@ -96,52 +168,27 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
                   question={questionObj.question}
                   change={(e) => handleChange(e, questionObj._id)}
                   defaultVal={feedbackState[questionObj._id]?.answer || ''}
+                  error={errorState[questionObj._id]}
                 />
-              )
+              );
             }
             return null;
           })
           :
           <span>Loading...</span>
         }
+        <Grid item xs={12} sm={8} md={6} lg={12}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: '36vw', mx: "auto" }}>
+            <Button variant="contained" onClick={handleSubmit} sx={{ fontsize: '0.75rem' }}>Submit</Button>
+            <Button variant="text" sx={{ fontsize: '0.75rem' }}>Clear Form</Button>
+          </Stack>
+        </Grid>
       </Grid>
     </>
-  )
-  {/* <> */ }
-  {/*   <Snackbar open={errorFilling} autoHideDuration={6000} onClose={handleAlertClose}> */ }
-  {/*     <Alert onClose={handleAlertClose} severity="error" variant="filled" sx={{ width: '100%' }}> */ }
-  {/*       Please fill all the required fields */ }
-  {/*     </Alert> */ }
-  {/*   </Snackbar> */ }
-  {/*   <Grid container spacing={1.5} justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}> */ }
-  {/*     {toUpdate ? */ }
-  {/*       <> */ }
-  {/*         <Question value="Status" change={handleState} name="status" defaultVal={state.status} /> */ }
-  {/*         <Question value="Recommendation/Remarks" change={handleState} name="recommendation" defaultVal={state.recommendation} /> */ }
-  {/*       </> */ }
-  {/*       : <></> */ }
-  {/*     } */ }
-  {/*     <Grid item xs={12} sm={8} md={6} lg={12}> */ }
-  {/*       {toUpdate ? */ }
-  {/*         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: 550, mx: "auto" }}> */ }
-  {/*           <Button variant="contained" onClick={handleUpdate} sx={{ fontsize: '0.75rem' }}>Update</Button> */ }
-  {/*           <Button variant="text" sx={{ fontsize: '0.75rem' }}>Clear Form</Button> */ }
-  {/*         </Stack> */ }
-  {/*         : */ }
-  {/*         <> */ }
-  {/*           <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: 550, mx: "auto" }}> */ }
-  {/*             <Button variant="contained" onClick={handleSubmit} sx={{ fontsize: '0.75rem' }}>Submit</Button> */ }
-  {/*             <Button variant="text" sx={{ fontsize: '0.75rem' }}>Clear Form</Button> */ }
-  {/*           </Stack> */ }
-  {/*         </> */ }
-  {/*       } */ }
-  {/*     </Grid> */ }
-  {/*   </Grid> */ }
-  {/**/ }
-  {/* </> */ }
+  );
 }
 
-function Header({ volunteerName, eventName, eventDate }) {
+export function Header({ volunteerName, eventName, eventDate }) {
   return (
     <Grid item xs={12} sm={8} md={6} lg={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
@@ -165,7 +212,7 @@ function Header({ volunteerName, eventName, eventDate }) {
   );
 }
 
-function Question({ question, change, error, defaultVal }) {
+export function Question({ question, change, error, defaultVal }) {
   return (
     <Grid item xs={12} sm={8} md={6} lg={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
@@ -181,10 +228,10 @@ function Question({ question, change, error, defaultVal }) {
         </CardContent>
       </Card>
     </Grid>
-  )
+  );
 }
 
-function MultipleChoice({ question, options, selectedOptions, change }) {
+function MultipleChoice({ question, options, selectedOptions, change, error }) {
   return (
     <Grid item xs={12} sm={8} md={6} lg={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
@@ -202,45 +249,42 @@ function MultipleChoice({ question, options, selectedOptions, change }) {
                     label={choice.name}
                     sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.9rem' } }}
                   />
-                )
-                )}
+                ))}
               </FormGroup>
+            </FormControl>
+            {error ? <FormHelperText>This is a required field...</FormHelperText> : <></>}
+          </Stack>
+        </CardContent>
+      </Card>
+    </Grid>
+  );
+}
+
+function SingleChoice({ question, options, selectedOption, change, error }) {
+  return (
+    <Grid item xs={12} sm={8} md={6} lg={12}>
+      <Card sx={{ maxWidth: 550, mx: "auto" }}>
+        <Divider />
+        <CardContent sx={{ padding: 2 }}>
+          <Stack direction="column" spacing={1}>
+            <Typography variant="subtitle1">
+              {question}
+            </Typography>
+            <FormControl error={error}>
+              <RadioGroup value={selectedOption} onChange={change}>
+                {options.map((choice) => (
+                  <FormControlLabel key={choice._id} value={choice.name} control={<Radio />} label={choice.name}
+                    sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.9rem' } }} />
+                ))}
+              </RadioGroup>
+              {error ? <FormHelperText>This is a required field...</FormHelperText> : <></>}
             </FormControl>
           </Stack>
         </CardContent>
       </Card>
     </Grid>
-
-  )
+  );
 }
-function SingleChoice({ question, options, selectedOption, change, error }) {
-  return (
-    <Grid item xs={12} sm={8} md={6} lg={12}>
-      <Card sx={{ maxWidth: 550, mx: "auto" }}>
-        <CardContent>
-          <Typography variant="subtitle1">
-            {question}
-          </Typography>
-          <FormControl component="fieldset" error={error}>
-            <RadioGroup aria-label="choices" name={question} value={selectedOption} onChange={change}>
-              {options.map((choice) => {
-                return (
-                  <FormControlLabel
-                    key={choice._id}
-                    value={choice.name}
-                    control={<Radio />}
-                    sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.9rem' } }}
-                    label={choice.name} />
-                )
-              })}
-            </RadioGroup>
-            {error ? <FormHelperText>This is a required field..</FormHelperText> : <> </>}
-          </FormControl>
-        </CardContent>
-      </Card>
-    </Grid>
-  )
-}
-
 
 export default AddTFeedback;
+

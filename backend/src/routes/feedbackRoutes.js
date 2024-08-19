@@ -116,7 +116,6 @@ router.get('/questions/:type', authenticateJwt, async (req, res) => {
   if (!feedback) {
     try {
       const newFeedback = await createClonedFeedback({ type, volunteerId, eventId });
-      console.log(newFeedback)
       await newFeedback.populate({ path: `${type}.questionnaire` });
       if (newFeedback) {
         res.status(200).json({ questionnaire: newFeedback[type].questionnaire });
@@ -136,8 +135,8 @@ router.get('/questions/:type', authenticateJwt, async (req, res) => {
 
 router.post('/create', authenticateJwt, async (req, res) => {
   const { eventId, volunteerId, answers } = req.body;
-  const feedback = Feedback.findOne({ eventId: eventId, volunteerId: volunteerId });
-  const volunteer = Volunteer.findById(volunteerId);
+  const feedback = await Feedback.findOne({ eventId: eventId, volunteerId: volunteerId });
+  const volunteer = await Volunteer.findById(volunteerId);
   if (feedback) {
     //feedback submit logic
     const adminId = req.user.id;
@@ -152,7 +151,7 @@ router.post('/create', authenticateJwt, async (req, res) => {
       }
       else if (question.type === 'single-choice') {
         question.options.forEach((option) => {
-          if (option.name === selectedOptions[0]) {
+          if (option.name === answer.selectedOptions[0]) {
             option.selected = true;
             if (option.name === 'Other')
               question.answer = answer.answer;
@@ -160,11 +159,13 @@ router.post('/create', authenticateJwt, async (req, res) => {
         });
       }
       else if (question.type === 'long-answer') {
-        question.answer = question.answer;
+        question.answer = answer.answer;
       }
+      await question.save();
     }
     feedback.givenBy = adminId;
-    volunteer.push(feedback._id);
+    await feedback.save();
+    volunteer.feedbacks.push(feedback._id);
     await volunteer.save();
     res.status(201).json({ message: "feedback submitted", feedback: feedback });
   }

@@ -35,11 +35,11 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
     if (type === 'training')
       navigate('/addtFeedback', { state: { volunteerName: volunteer.volunteerId.name, volunteerId: volunteer.volunteerId._id, event: event, type: 'training' } })
     else if (type === 'programVolunteer')
-      navigate('/addpvfeedback', { state: { volunteerName: volunteer.volunteerId.name, volunteerId: volunteer.volunteerId._id, event: event } })
+      navigate('/addpvfeedback', { state: { volunteerName: volunteer.volunteerId.name, volunteerId: volunteer.volunteerId._id, event: event, type: 'programVolunteer' } })
   }
 
   const feedbackExist = () => {
-    const exist = feedbacks.find(f => (f.eventId === event._id));
+    const exist = feedbacks.find(f => (f.eventId._id === event._id));
     return Boolean(exist);
   }
   const formatDate = (date) => {
