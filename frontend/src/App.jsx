@@ -12,6 +12,7 @@ import AddPVFeedback from './components/AddPVFeedback.jsx';
 import ViewFeedback from './components/ViewFeedback.jsx';
 import AddTFeedback from './components/AddTFeedback.jsx';
 import VolunteerDashboard from './components/VolunteersDashboard.jsx';
+import SingleVolunteer from './components/SingleVolunteer.jsx';
 
 function App() {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ function App() {
               <Route path="/viewfeedback/:feedbackId" element={<ViewFeedback />} />
               <Route path="/addtfeedback/" element={<AddTFeedback />} />
               <Route path="/volunteerdashboard" element={<VolunteerDashboard />} />
+              <Route path="/volunteerdashboard/:volunteerId" element={<SingleVolunteer />} />
             </Routes>
           </AuthProvider>
         </LocalizationProvider>

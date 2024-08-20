@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Events } from "./Event";
-import { Grid, Typography } from "@mui/material";
+import { Container, Grid, Typography } from "@mui/material";
 import UpdateCard from "./UpdateEvent";
 import VolunteerTable from "./VolunteerTable";
 
@@ -24,20 +24,22 @@ function SingleEvent() {
   }, []);
   return (
     <>
-      {/* <GrayTopper name={events.name} /> */}
-      <Grid container>
-        <Grid item lg={6} md={12} sm={12}>
-          <UpdateCard event={events} setEvent={setEvents} />
+      <Container maxWidth="lg">
+        {/* <GrayTopper name={events.name} /> */}
+        <Grid container>
+          <Grid item lg={6} md={12} sm={12}>
+            <UpdateCard event={events} setEvent={setEvents} />
+          </Grid>
+          <Grid item lg={6} md={12} sm={12}>
+            {events ?
+              <Events sx={{ display: "flex", justifyContent: "center" }} event={events} />
+              : "Loading.."}
+          </Grid>
+          <Grid item lg={12} md={12} sm={12}>
+            <VolunteerTable event={events} />
+          </Grid>
         </Grid>
-        <Grid item lg={6} md={12} sm={12}>
-          {events ?
-            <Events sx={{ display: "flex", justifyContent: "center" }} event={events} />
-            : "Loading.."}
-        </Grid>
-        <Grid item lg={12} md={12} sm={12}>
-          <VolunteerTable event={events} />
-        </Grid>
-      </Grid>
+      </Container>
     </>
   )
 

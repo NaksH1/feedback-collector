@@ -22,7 +22,6 @@ router.get('/getList', async (req, res) => {
   const training = [];
   const potential = [];
   const programVolunteer = [];
-  console.log(volunteers);
   for (const volunteer of volunteers) {
     let existT = false;
     let existPV = false;
@@ -41,6 +40,32 @@ router.get('/getList', async (req, res) => {
     });
   }
   res.json({ training: training, programVolunteer: programVolunteer, potential: potential });
+})
+
+router.get('/volunteerfulldetails/:volunteerId', authenticateJwt, async (req, res) => {
+  const volunteerId = req.params.volunteerId;
+  const volunteer = await Volunteer.findById(volunteerId).populate({
+    path: 'feedbacks',
+    match: { deletedAt: { $eq: null } },
+    populate: [
+      { path: 'eventId', select: 'name date' },
+      { path: 'givenBy', select: 'name' },
+      { path: 'training.questionnaire' },
+      { path: 'programVolunteer.questionnaire' }
+    ]
+  }).exec();
+  const programCounter = {};
+  if (!volunteer)
+    res.status(404).json({ message: 'Volunteer not found' });
+  for (const feedback of volunteer.feedbacks) {
+    const eventName = feedback.eventId.name;
+    if (programCounter.hasOwnProperty(eventName))
+      programCounter[eventName] += 1;
+    else
+      programCounter[eventName] = 1;
+  }
+  const totalProgram = volunteer.feedbacks.length;
+  res.status(200).json({ volunteer: volunteer, programCounter: programCounter, totalProgram: totalProgram });
 })
 
 router.put('/:volunteerId', authenticateJwt, async (req, res) => {

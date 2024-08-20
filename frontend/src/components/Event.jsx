@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Alert, Card, Snackbar, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Card, Snackbar, Stack, TextField, Typography, Container } from "@mui/material";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import AddEvent from './AddEvent';
@@ -41,22 +41,24 @@ function Event() {
   }
   return (
     <>
-      <Snackbar open={eventAdded} autoHideDuration={6000} onClose={handleAlertClose}>
-        <Alert onClose={handleAlertClose} severity="success" variant="filled" sx={{ width: '100%' }}>
-          Event added
-        </Alert>
-      </Snackbar>
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ marginTop: 2, marginRight: 1 }}>
-        <TextField id="filled-basic" label="Search Event" variant="filled" fullWidth />
-        <AddIcon variant="outlined" onClick={handleOpen} fontSize='medium' ></AddIcon>
-        {open ? <AddEvent open={open} setOpen={setOpen} setEvents={setEvents} handleClose={handleClose} setEventAdded={setEventAdded} /> : <></>}
+      <Container maxWidth="lg">
+        <Snackbar open={eventAdded} autoHideDuration={6000} onClose={handleAlertClose}>
+          <Alert onClose={handleAlertClose} severity="success" variant="filled" sx={{ width: '100%' }}>
+            Event added
+          </Alert>
+        </Snackbar>
+        <Stack direction="row" spacing={2} alignItems="center" sx={{ marginTop: 2, marginRight: 1 }}>
+          <TextField id="filled-basic" label="Search Event" variant="filled" fullWidth />
+          <AddIcon variant="outlined" onClick={handleOpen} fontSize='medium' ></AddIcon>
+          {open ? <AddEvent open={open} setOpen={setOpen} setEvents={setEvents} handleClose={handleClose} setEventAdded={setEventAdded} /> : <></>}
 
-      </Stack>
-      <Stack direction="row" spacing={2} sx={{ marginTop: 2, display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
-        {events.map((event) => {
-          return <Events event={event} key={event._id} />
-        })}
-      </Stack>
+        </Stack>
+        <Stack direction="row" spacing={2} sx={{ marginTop: 2, display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
+          {events.map((event) => {
+            return <Events event={event} key={event._id} />
+          })}
+        </Stack>
+      </Container>
     </>
   )
 }
