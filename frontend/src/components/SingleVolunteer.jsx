@@ -1,7 +1,7 @@
 import { Button, Card, CardContent, Container, Grid, IconButton, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import dayjs from "dayjs";
@@ -14,6 +14,7 @@ function SingleVolunteer() {
   const [feedbacks, setFeedbacks] = useState([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletedFeedbackId, setDeletedFeedbackId] = useState();
+  const navigate = useNavigate();
   useEffect(() => {
     axios({
       method: 'get',

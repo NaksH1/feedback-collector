@@ -6,10 +6,12 @@ import AddPVFeedback, { AREA_CHOICES, OPTIONS, REMARKS } from "./AddPVFeedback";
 import dayjs from "dayjs";
 import { Alert, Button, Card, CardContent, CardHeader, Divider, Grid, Snackbar, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
+import AddTFeedback from "./AddTFeedback";
 
 function ViewFeedback() {
   const { feedbackId } = useParams();
   const [feedback, setFeedback] = useState(null);
+  const [feedbackState, setFeedbackState] = useState();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,18 +25,23 @@ function ViewFeedback() {
           }
         });
 
-        const feedbackData = fetchResult.data.feedback;
-        if (feedbackData && feedbackData.type === 'programVolunteer' && feedbackData.programVolunteer) {
-          const otherFields = { activity: '', communication: '', fitness: '', commitment: '', remarks: '', train: '' };
-          findOtherField(AREA_CHOICES, 'activity', otherFields, feedbackData);
-          findOtherField(OPTIONS, 'communication', otherFields, feedbackData);
-          findOtherField(OPTIONS, 'fitness', otherFields, feedbackData);
-          findOtherField(OPTIONS, 'commitment', otherFields, feedbackData);
-          findOtherField(REMARKS, 'remarks', otherFields, feedbackData);
-          findOtherField(AREA_CHOICES, 'train', otherFields, feedbackData);
-          feedbackData.programVolunteer.otherFields = otherFields;
-        }
-        setFeedback(feedbackData);
+        // const feedbackData = fetchResult.data.feedback;
+        // if (feedbackData && feedbackData.type === 'programVolunteer' && feedbackData.programVolunteer) {
+        //   const otherFields = { activity: '', communication: '', fitness: '', commitment: '', remarks: '', train: '' };
+        //   findOtherField(AREA_CHOICES, 'activity', otherFields, feedbackData);
+        //   findOtherField(OPTIONS, 'communication', otherFields, feedbackData);
+        //   findOtherField(OPTIONS, 'fitness', otherFields, feedbackData);
+        //   findOtherField(OPTIONS, 'commitment', otherFields, feedbackData);
+        //   findOtherField(REMARKS, 'remarks', otherFields, feedbackData);
+        //   findOtherField(AREA_CHOICES, 'train', otherFields, feedbackData);
+        //   feedbackData.programVolunteer.otherFields = otherFields;
+        // }
+        // setFeedback(feedbackData);
+        // setLoading(false);
+        console.log(fetchResult.data);
+        setFeedback(fetchResult.data.feedback);
+        if (fetchResult.data.feedback.type !== 'potential')
+          setFeedbackState(fetchResult.data.feedbackState);
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -57,12 +64,14 @@ function ViewFeedback() {
       const otherInfo = {
         volunteerName: feedback.volunteerId.name,
         volunteerId: feedback.volunteerId._id,
-        event: feedback.eventId
+        event: feedback.eventId,
+        type: feedback.type
       }
       return (
-        <AddFeedback
+        <AddTFeedback
           viewFeedback={feedback}
           otherInfo={otherInfo}
+          viewFeedbackState={feedbackState}
           toUpdate={true}
         />
       );
@@ -115,15 +124,21 @@ function ViewFeedback() {
 
   return (
     <>
-      {loading ? (
-        <span>Loading...</span>
-      ) : (
+      {/* {loading ? ( */}
+      {/*   <span>Loading...</span> */}
+      {/* ) : ( */}
+      {/*   <> */}
+      {/*     <br /> */}
+      {/*     {feedback?.type === 'training' ? getTrainingFeedback() : feedback?.type === 'programVolunteer' ? getProgramVolunteerFeedback() : */}
+      {/*       feedback?.type === 'potential' ? getPotentialFeedback() : <></>} */}
+      {/*   </> */}
+      {/* )} */}
+      {loading ?
+        <span>Loading...</span> :
         <>
-          <br />
-          {feedback?.type === 'training' ? getTrainingFeedback() : feedback?.type === 'programVolunteer' ? getProgramVolunteerFeedback() :
-            feedback?.type === 'potential' ? getPotentialFeedback() : <></>}
+          {feedback?.type === 'training' ? getTrainingFeedback() : <></>}
         </>
-      )}
+      }
     </>
   );
 }

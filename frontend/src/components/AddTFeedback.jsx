@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import dayjs from "dayjs";
 
-function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
+function AddTFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState }) {
   const location = useLocation();
   const { volunteerName, volunteerId, event, type } = location.state || otherInfo;
   const navigate = useNavigate();
@@ -12,6 +12,7 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
   const [feedbackState, setFeedbackState] = useState({});
   const [errorState, setErrorState] = useState({});
   const [errorFilling, setErrorFilling] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState({});
 
   useEffect(() => {
     axios({
@@ -26,7 +27,15 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
       }
     }).then((resp) => {
       setQuestionnaire(resp.data?.feedback[type].questionnaire);
+      setUpdateInfo((preState) => ({
+        ...preState,
+        status: resp.data?.feedback[type].status,
+        recommendation: resp.data?.feedback[type].recommendation
+      }))
     });
+    if (viewFeedback && viewFeedbackState) {
+      setFeedbackState(viewFeedbackState);
+    }
   }, []);
 
   const formatDate = (date) => {
@@ -66,6 +75,13 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
     });
   }
 
+  const handleUpdate = (e, name) => {
+    setUpdateInfo((preState) => ({
+      ...preState,
+      [name]: e.target.value
+    }))
+  }
+
   const validateForm = () => {
     let isValid = true;
     const newErrorState = {};
@@ -99,21 +115,41 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
         })
       }
       try {
-        const resp = await axios({
-          method: 'post',
-          url: 'http://localhost:3000/feedback/create',
-          headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
-          },
-          data: {
-            volunteerId: volunteerId,
-            eventId: event._id,
-            answers: answers
-          }
-        });
-        console.log('Feeback Submitted', resp.data);
-        alert('Feedback Submitted');
-        navigate(`/events/${event._id}`);
+        if (!toUpdate) {
+          const resp = await axios({
+            method: 'post',
+            url: 'http://localhost:3000/feedback/create',
+            headers: {
+              'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            data: {
+              volunteerId: volunteerId,
+              eventId: event._id,
+              answers: answers
+            }
+          });
+          console.log('Feeback Submitted', resp.data);
+          alert('Feedback Submitted');
+          navigate(`/events/${event._id}`);
+        }
+        else {
+          const resp = await axios({
+            method: 'post',
+            url: 'http://localhost:3000/feedback/create',
+            headers: {
+              'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            data: {
+              volunteerId: volunteerId,
+              eventId: event._id,
+              answers: answers,
+              toUpdate: true,
+              updateInfo: updateInfo
+            }
+          });
+          console.log('Feedback Updated', resp.data);
+          alert('Feedback Updated');
+        }
       }
       catch (err) {
         console.log('Error while submitting ' + err);
@@ -135,7 +171,7 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
           Please fill all the required fields
         </Alert>
       </Snackbar>
-      <Grid container spacing={1.5} justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
+      <Grid container spacing={1.5} justifyContent="center" alignItems="flex-start" style={{ minHeight: '100vh', position: 'relative' }}>
         <Header volunteerName={volunteerName} eventName={event.name} eventDate={formatDate(event.date)} />
         {questionnaire ?
           questionnaire.map((questionObj) => {
@@ -177,9 +213,18 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate }) {
           :
           <span>Loading...</span>
         }
+        {toUpdate && (
+          <Grid item xs={12} md={4} sx={{ position: 'sticky', top: '16px', alignSelf: 'flex-start' }}>
+            <Stack spacing={2}>
+              <UpdateQuestion question="Status" change={(e) => { handleUpdate(e, 'status') }} defaultVal={updateInfo.status ? updateInfo.status : ''} />
+              <UpdateQuestion question="Recommendation" change={(e) => { handleUpdate(e, 'recommendation') }}
+                defaultVal={updateInfo.recommendation ? updateInfo.recommendation : ''} />
+            </Stack>
+          </Grid>
+        )}
         <Grid item xs={12} sm={8} md={6} lg={12}>
           <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: '36vw', mx: "auto" }}>
-            <Button variant="contained" onClick={handleSubmit} sx={{ fontsize: '0.75rem' }}>Submit</Button>
+            <Button variant="contained" onClick={handleSubmit} sx={{ fontsize: '0.75rem' }}>{toUpdate ? 'Update' : 'Submit'}</Button>
             <Button variant="text" sx={{ fontsize: '0.75rem' }}>Clear Form</Button>
           </Stack>
         </Grid>
@@ -228,6 +273,22 @@ export function Question({ question, change, error, defaultVal }) {
         </CardContent>
       </Card>
     </Grid>
+  );
+}
+
+function UpdateQuestion({ question, change, defaultVal }) {
+  return (
+    <Card sx={{ maxWidth: 550, mx: "auto" }}>
+      <CardContent sx={{ padding: 2 }}>
+        <Stack direction="column" spacing={1}>
+          <Typography variant="subtitle1">
+            {question}
+          </Typography>
+          <TextField required label="Your answer" variant="standard" onChange={change}
+            value={defaultVal ? defaultVal : ""} InputLabelProps={{ shrink: true }}></TextField>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 }
 

@@ -39,13 +39,30 @@ router.get('/view/:feedbackId', authenticateJwt, async (req, res) => {
   const feedback = await Feedback.findById(req.params.feedbackId).populate([
     { path: 'eventId' },
     { path: 'volunteerId', select: 'name' },
-    { path: 'givenBy', select: 'name' }
+    { path: 'givenBy', select: 'name' },
+    { path: 'programVolunteer.questionnaire' },
+    { path: 'training.questionnaire' }
   ]);
-  if (feedback) {
-    res.json({ feedback: feedback });
-  }
-  else
+  if (!feedback)
     res.status(404).json({ message: "Feedback not found" });
+  if (feedback.type === 'training' || feedback.type === 'programVolunteer') {
+    let feedbackState = {};
+    for (const question of feedback[feedback.type].questionnaire) {
+      feedbackState[question._id] = feedbackState[question._id] || {};
+      if (question.options && question.options.length) {
+        feedbackState[question._id].selectedOptions = [];
+        for (const option of question.options) {
+          if (option.selected) {
+            feedbackState[question._id].selectedOptions.push(option.name);
+          }
+        }
+      }
+      if (question.answer)
+        feedbackState[question._id].answer = question.answer;
+    }
+    return res.json({ feedback: feedback, feedbackState: feedbackState });
+  }
+  return res.json({ feedback: feedback })
 })
 
 router.put('/:feedbackId', authenticateJwt, async (req, res) => {
@@ -135,6 +152,7 @@ router.get('/questions/:type', authenticateJwt, async (req, res) => {
 
 router.post('/create', authenticateJwt, async (req, res) => {
   const { eventId, volunteerId, answers } = req.body;
+  const { toUpdate, updateInfo } = req.body;
   const feedback = await Feedback.findOne({ eventId: eventId, volunteerId: volunteerId });
   const volunteer = await Volunteer.findById(volunteerId);
   if (feedback) {
@@ -164,9 +182,15 @@ router.post('/create', authenticateJwt, async (req, res) => {
       await question.save();
     }
     feedback.givenBy = adminId;
+    if (toUpdate) {
+      feedback[feedback.type].status = updateInfo?.status || '';
+      feedback[feedback.type].recommendation = updateInfo?.recommendation || '';
+    }
     await feedback.save();
-    volunteer.feedbacks.push(feedback._id);
-    await volunteer.save();
+    if (!volunteer.feedbacks.includes(feedback._id)) {
+      volunteer.feedbacks.push(feedback._id);
+      await volunteer.save();
+    }
     res.status(201).json({ message: "feedback submitted", feedback: feedback });
   }
   else {

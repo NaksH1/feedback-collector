@@ -5,6 +5,7 @@ import axios from 'axios';
 import AddEvent from './AddEvent';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
+import { darken } from '@mui/system';
 
 function Event() {
   const [open, setOpen] = useState(false);
@@ -79,14 +80,27 @@ export function Events({ event, index }) {
   return (
     <div>
       <Card sx={{
-        margin: 2, width: 300, minHeight: 200,
+        margin: 2,
+        width: 300,
+        height: '33vh',
+        display: 'flex', flexDirection: 'column',
+        justifyContent: 'space-between',
+        boxShadow: 3,
+        transition: 'box-shadow 0.3s ease-in-out, backgroundColor 0.3s ease-in-out',
+        '&:hover': {
+          boxShadow: 9,
+          backgroundColor: darken(backgroundColor, 0.1)
+        },
         backgroundColor
       }} onClick={handleEventClick}>
-        <img src={event.image} style={{
-          width: 300,
-          clipPath,
-          cursor: 'pointer',
-        }}></img>
+        <Box sx={{ height: '18vh', overflow: 'hidden', clipPath, cursor: 'pointer' }}>
+          <img src={event.image} style={{
+            width: '100%',
+            hieght: '100%',
+            objectFit: 'cover',
+            cursor: 'pointer'
+          }} />
+        </Box>
         <Typography textAlign={"center"} variant='h5' sx={{ color: '#fff' }}>
           {event.name}
         </Typography>
