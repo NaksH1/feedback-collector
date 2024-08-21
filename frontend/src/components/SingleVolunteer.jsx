@@ -107,11 +107,11 @@ function SingleVolunteer() {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ backgroundColor: '#f5f5f5', fontWeight: 'bold', width: '30%' }}>Event Name</TableCell>
-                    <TableCell sx={{ backgroundColor: '#f5f5f5', fontWeight: 'bold', width: '20%' }}>Status</TableCell>
-                    <TableCell sx={{ backgroundColor: '#f5f5f5', fontWeight: 'bold', width: '20%' }}>Date</TableCell>
-                    <TableCell sx={{ backgroundColor: '#f5f5f5', fontWeight: 'bold', width: '20%' }}>Given By</TableCell>
-                    <TableCell sx={{ backgroundColor: '#f5f5f5', fontWeight: 'bold', width: '10%', alignContent: 'center' }}>Action</TableCell>
+                    <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '30%', color: '#fff' }}>Event Name</TableCell>
+                    <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '20%', color: '#fff' }}>Status</TableCell>
+                    <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '20%', color: '#fff' }}>Date</TableCell>
+                    <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '20%', color: '#fff' }}>Given By</TableCell>
+                    <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '10%', alignContent: 'center', color: '#fff' }}>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

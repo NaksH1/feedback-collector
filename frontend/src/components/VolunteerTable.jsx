@@ -71,10 +71,10 @@ function VolunteerTable({ event }) {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell align="right">Type</TableCell>
-              <TableCell align="right">Mobile Number</TableCell>
-              <TableCell align="right">Created By</TableCell>
+              <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '30%', color: '#fff' }}>Name</TableCell>
+              <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '30%', color: '#fff' }}>Type</TableCell>
+              <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '20%', color: '#fff' }}>Mobile Number</TableCell>
+              <TableCell align="right" sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '20%', color: '#fff' }}>Created By</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -86,8 +86,8 @@ function VolunteerTable({ event }) {
                 <TableCell component="th" scope="row">
                   {row.volunteerId.name}
                 </TableCell>
-                <TableCell align="right">{getVolunteerType(row.type)}</TableCell>
-                <TableCell align="right">{row.volunteerId.mobileNumber}</TableCell>
+                <TableCell >{getVolunteerType(row.type)}</TableCell>
+                <TableCell >{row.volunteerId.mobileNumber}</TableCell>
                 <TableCell align="right">{row.volunteerId.createdBy.name}</TableCell>
               </TableRow>
             ))}

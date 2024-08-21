@@ -43,8 +43,8 @@ function List({ list, listName }) {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ backgroundColor: '#f5f5f5', fontWeight: 'bold', width: '40%' }}>{listName}</TableCell>
-              <TableCell sx={{ backgroundColor: '#f5f5f5', fontWeight: 'bold', width: '40%' }}>Mobile Number</TableCell>
+              <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '40%', color: '#fff' }}>{listName}</TableCell>
+              <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '40%', color: '#fff' }}>Mobile Number</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

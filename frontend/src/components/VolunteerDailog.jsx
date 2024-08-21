@@ -105,14 +105,14 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
         aria-labelledby="responsive-dialog-title"
         maxWidth="lg"
       >
-        <DialogTitle id="responsive-dialog-title">
+        <DialogTitle id="responsive-dialog-title" sx={{ backgroundColor: '#f3f0e5' }}>
           {volunteer ? (
-            <Typography variant='subtitle1' >
+            <Typography variant='subtitle1' sx={{ color: '#cc4521', fontWeight: 'bold' }}>
               {volunteer.volunteerId.name}
             </Typography>
           ) : <>"Loading..."</>}
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ backgroundColor: '#f3f0e5' }}>
           {volunteer ? (
             <>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -125,10 +125,10 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                   <TableHead>
                     <TableRow>
-                      <TableCell >Action</TableCell>
-                      <TableCell>Event Name</TableCell>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Given By</TableCell>
+                      <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '30%', color: '#fff' }}>Event Name</TableCell>
+                      <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '30%', color: '#fff' }}>Date</TableCell>
+                      <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '20%', color: '#fff' }}>Given By</TableCell>
+                      <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '20%', color: '#fff' }}>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -137,6 +137,11 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
                         key={row._id}
                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                       >
+                        <TableCell component="th" scope="row">
+                          {row.eventId.name}
+                        </TableCell>
+                        <TableCell>{formatDate(row.eventId.date)}</TableCell>
+                        <TableCell>{row.givenBy.name}</TableCell>
                         <TableCell >
                           <Tooltip title="View">
                             <IconButton>
@@ -149,12 +154,6 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
                             </IconButton>
                           </Tooltip>
                         </TableCell>
-                        <TableCell component="th" scope="row">
-                          {row.eventId.name}
-                        </TableCell>
-                        <TableCell>{formatDate(row.eventId.date)}</TableCell>
-                        <TableCell>{row.givenBy.name}</TableCell>
-
                       </TableRow>
                     ))}
                   </TableBody>
@@ -166,8 +165,13 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
               <> "Loading..."</>
             )}
         </DialogContent>
-        <DialogActions>
-          <Button autoFocus onClick={handleClose}>
+        <DialogActions sx={{ backgroundColor: '#f3f0e5' }}>
+          <Button autoFocus onClick={handleClose}
+            sx={{
+              color: '#cc4521', fontWeight: 'bold', '&:hover': {
+                color: '#03346E'
+              }
+            }}>
             Close
           </Button>
         </DialogActions>

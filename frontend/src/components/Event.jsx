@@ -41,7 +41,7 @@ function Event() {
   }
   return (
     <>
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Snackbar open={eventAdded} autoHideDuration={6000} onClose={handleAlertClose}>
           <Alert onClose={handleAlertClose} severity="success" variant="filled" sx={{ width: '100%' }}>
             Event added
