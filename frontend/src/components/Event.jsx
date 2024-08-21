@@ -75,7 +75,7 @@ export function Events({ event, index }) {
   }
   const date = formatDate(event.date);
   const backgroundColor = index % 3 === 0 ? '#dc9e40' : index % 2 === 0 ? '#d4782e' : '#b05912';
-  const clipPath = index % 2 === 0 ? 'polygon(0px 0px, 100% 0px, 100% 90%, 0% 98%)' : 'polygon(0px 0px, 100% 0px, 100% 98%, 0% 90%)';
+  const clipPath = index % 2 !== 0 ? 'polygon(0px 0px, 100% 0px, 100% 90%, 0% 98%)' : 'polygon(0px 0px, 100% 0px, 100% 98%, 0% 90%)';
   return (
     <div>
       <Card sx={{
