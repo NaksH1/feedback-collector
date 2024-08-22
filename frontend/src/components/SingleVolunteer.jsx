@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, Container, Grid, IconButton, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Container, Grid, IconButton, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -30,6 +30,7 @@ function SingleVolunteer() {
       setFeedbacks(resp.data.volunteer.feedbacks);
     })
   }, [])
+
   const formatDate = (date) => {
     if (!date)
       return '';
@@ -88,21 +89,37 @@ function SingleVolunteer() {
         <Grid container spacing={1.5} alignItems="center" sx={{ marginTop: '9vh' }}>
           <Grid item lg={4}>
             <Card sx={{
-              borderRadius: "12px", textAlign: "left",
+              margin: 0,
+              borderRadius: "12px",
+              textAlign: "left",
               boxShadow: "0 2px 4px -2px rgba(0,0,0,0.24), 0 4px 24px -2px rgba(0, 0, 0, 0.2)"
             }}>
-              <CardContent>
-                <Typography variant="h5" component="div">
-                  Volunteer name: {volunteer.name}
-                </Typography>
-                <Typography variant="body1">
-                  Mobile Number: {volunteer.mobileNumber}
-                  <br />
-                  Total Programs Completed: {totalProgram}
-                </Typography>
+              <CardContent sx={{ padding: 0 }}>
+                <Box sx={{
+                  backgroundColor: '#ad4511',
+                  clipPath: 'polygon(0px 0px, 100% 0px, 100% 86%, 0% 98%)',
+                  padding: '16px',
+                  borderRadius: "12px 12px 0 0",
+                }}>
+                  <Typography variant="h5" component="div" color="#fff">
+                    {volunteer.name}
+                  </Typography>
+                </Box>
+                <Box sx={{
+                  backgroundColor: '#fff',
+                  padding: '16px',
+                  borderRadius: "0 0 12px 12px"
+                }}>
+                  <Typography variant="body1" color="#000">
+                    Mobile Number: {volunteer.mobileNumber}
+                    <br />
+                    Total Programs Completed: {totalProgram}
+                  </Typography>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
+
           <Grid item lg={12}>
             <TableContainer component={Paper} sx={{ marginTop: '5vh' }}>
               <Table>
@@ -129,13 +146,13 @@ function SingleVolunteer() {
                       <TableCell>{row.givenBy.name}</TableCell>
                       <TableCell align="right">
                         <Tooltip title="View">
-                          <IconButton>
-                            <VisibilityIcon onClick={() => viewFeedback(row._id)} />
+                          <IconButton onClick={() => viewFeedback(row._id)} >
+                            <VisibilityIcon />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Delete">
-                          <IconButton>
-                            <DeleteOutlineIcon onClick={() => deleteFeedback(row._id)} />
+                          <IconButton onClick={() => deleteFeedback(row._id)}>
+                            <DeleteOutlineIcon />
                           </IconButton>
                         </Tooltip>
                       </TableCell>

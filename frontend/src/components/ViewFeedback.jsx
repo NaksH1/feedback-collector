@@ -1,12 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import AddFeedback, { Question } from "./AddFeedback";
-import AddPVFeedback, { AREA_CHOICES, OPTIONS, REMARKS } from "./AddPVFeedback";
+import { Question } from "./AddFeedback";
+import AddPVFeedback from "./AddPVFeedback";
 import dayjs from "dayjs";
 import { Alert, Button, Card, CardContent, CardHeader, Divider, Grid, Snackbar, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
-import AddTFeedback from "./AddTFeedback";
+import AddTFeedback, { Header } from "./AddTFeedback";
 
 function ViewFeedback() {
   const { feedbackId } = useParams();
@@ -25,19 +25,6 @@ function ViewFeedback() {
           }
         });
 
-        // const feedbackData = fetchResult.data.feedback;
-        // if (feedbackData && feedbackData.type === 'programVolunteer' && feedbackData.programVolunteer) {
-        //   const otherFields = { activity: '', communication: '', fitness: '', commitment: '', remarks: '', train: '' };
-        //   findOtherField(AREA_CHOICES, 'activity', otherFields, feedbackData);
-        //   findOtherField(OPTIONS, 'communication', otherFields, feedbackData);
-        //   findOtherField(OPTIONS, 'fitness', otherFields, feedbackData);
-        //   findOtherField(OPTIONS, 'commitment', otherFields, feedbackData);
-        //   findOtherField(REMARKS, 'remarks', otherFields, feedbackData);
-        //   findOtherField(AREA_CHOICES, 'train', otherFields, feedbackData);
-        //   feedbackData.programVolunteer.otherFields = otherFields;
-        // }
-        // setFeedback(feedbackData);
-        // setLoading(false);
         console.log(fetchResult.data);
         setFeedback(fetchResult.data.feedback);
         if (fetchResult.data.feedback.type !== 'potential')
@@ -51,13 +38,6 @@ function ViewFeedback() {
     fetchFeedback();
   }, [feedbackId]);
 
-  function findOtherField(array, value, otherFields, feedbackData) {
-    const area = array.find(ele => ele === feedbackData.programVolunteer[value]);
-    if (!area) {
-      otherFields[value] = feedbackData.programVolunteer[value];
-      feedbackData.programVolunteer[value] = 'Other';
-    }
-  }
   const getTrainingFeedback = () => {
 
     if (feedback && feedback.volunteerId && feedback.eventId) {
@@ -85,14 +65,15 @@ function ViewFeedback() {
       const otherInfo = {
         volunteerName: feedback.volunteerId.name,
         volunteerId: feedback.volunteerId._id,
-        event: feedback.eventId
+        event: feedback.eventId,
+        type: feedback.type
       }
 
-      console.log("updated feedback", feedback);
       return (
         <AddPVFeedback
           viewFeedback={feedback}
           otherInfo={otherInfo}
+          viewFeedbackState={feedbackState}
           toUpdate={true}
         />
       );
@@ -136,7 +117,8 @@ function ViewFeedback() {
       {loading ?
         <span>Loading...</span> :
         <>
-          {feedback?.type === 'training' ? getTrainingFeedback() : <></>}
+          {feedback?.type === 'training' ? getTrainingFeedback() : feedback?.type === 'programVolunteer' ? getProgramVolunteerFeedback() :
+            <></>}
         </>
       }
     </>
@@ -213,27 +195,8 @@ function ViewPotentialFeedback({ otherInfo, feedback }) {
         </Alert>
       </Snackbar>
       <Grid container spacing={1.5} justifyContent="center" alignItems="center" >
-        <Grid item xs={12} sm={8} md={6} lg={12}>
-          <Card sx={{ maxWidth: 550, mx: "auto" }}>
-            <CardHeader
-              title="Sadhguru Sahabhagi Trainees Feedback- Observation Phase"
-            />
-            <Divider />
-            <CardContent>
-              <Typography>
-                Sadhguru Sahabhagi Name : {volunteerName}
-              </Typography>
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" component="div">
-                  Event Name: {event ? event.name : ''}
-                </Typography>
-                <Typography variant="body2" component="div">
-                  Date: {event ? formatDate(event.date) : ''}
-                </Typography>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
+        <Header volunteerName={volunteerName} eventName={event.name} eventDate={formatDate(event.date)}
+          title="Potential Sahabhagi Feedback" />
         <Question value="Status" change={handleState} name="status" defaultVal={state.status} />
         <Question value="Recommendation/Remarks" change={handleState} name="recommendation" defaultVal={state.recommendation} />
         <Question value="Remarks" change={handleState} name="remarks" error={state.errors.remarks} defaultVal={state.remarks} />

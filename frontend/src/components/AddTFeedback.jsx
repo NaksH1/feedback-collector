@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, Checkbox, Divider, FormControl, Radio, RadioGroup, FormControlLabel, FormGroup, FormLabel, Grid, Stack, TextField, Typography, Button, FormHelperText, Snackbar, Alert } from "@mui/material";
+import { Card, CardContent, CardHeader, Checkbox, Divider, FormControl, Radio, RadioGroup, FormControlLabel, FormGroup, FormLabel, Grid, Stack, TextField, Typography, Button, FormHelperText, Snackbar, Alert, Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -172,49 +172,58 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState }) 
         </Alert>
       </Snackbar>
       <Grid container spacing={1.5} justifyContent="center" alignItems="flex-start" style={{ minHeight: '100vh', position: 'relative' }}>
-        <Header volunteerName={volunteerName} eventName={event.name} eventDate={formatDate(event.date)} />
-        {questionnaire ?
-          questionnaire.map((questionObj) => {
-            if (questionObj.type === 'single-choice') {
-              return (
-                <SingleChoice
-                  key={questionObj._id}
-                  question={questionObj.question}
-                  options={questionObj.options}
-                  selectedOption={feedbackState[questionObj._id]?.selectedOptions[0] || ''}
-                  change={(e) => handleChange(e, questionObj._id)}
-                  error={errorState[questionObj._id]}
-                />
-              );
-            } else if (questionObj.type === 'multiple-choice') {
-              return (
-                <MultipleChoice
-                  key={questionObj._id}
-                  question={questionObj.question}
-                  options={questionObj.options}
-                  selectedOptions={feedbackState[questionObj._id]?.selectedOptions || []}
-                  change={(e) => handleChange(e, questionObj._id)}
-                  error={errorState[questionObj._id]}
-                />
-              );
-            } else if (questionObj.type === 'long-answer') {
-              return (
-                <Question
-                  key={questionObj._id}
-                  question={questionObj.question}
-                  change={(e) => handleChange(e, questionObj._id)}
-                  defaultVal={feedbackState[questionObj._id]?.answer || ''}
-                  error={errorState[questionObj._id]}
-                />
-              );
-            }
-            return null;
-          })
-          :
-          <span>Loading...</span>
-        }
+        <Grid container spacing={1.5} xs={12} md={8} lg={6} direction="column" sx={{ marginTop: '2vh' }}>
+          <Header volunteerName={volunteerName} eventName={event.name} eventDate={formatDate(event.date)}
+            title="Sadhguru Sahabhagi Trainees Feedback - Observation Phase" />
+          {questionnaire ?
+            questionnaire.map((questionObj) => {
+              if (questionObj.type === 'single-choice') {
+                return (
+                  <SingleChoice
+                    key={questionObj._id}
+                    question={questionObj.question}
+                    options={questionObj.options}
+                    selectedOption={feedbackState[questionObj._id]?.selectedOptions[0] || ''}
+                    change={(e) => handleChange(e, questionObj._id)}
+                    error={errorState[questionObj._id]}
+                  />
+                );
+              } else if (questionObj.type === 'multiple-choice') {
+                return (
+                  <MultipleChoice
+                    key={questionObj._id}
+                    question={questionObj.question}
+                    options={questionObj.options}
+                    selectedOptions={feedbackState[questionObj._id]?.selectedOptions || []}
+                    change={(e) => handleChange(e, questionObj._id)}
+                    error={errorState[questionObj._id]}
+                  />
+                );
+              } else if (questionObj.type === 'long-answer') {
+                return (
+                  <Question
+                    key={questionObj._id}
+                    question={questionObj.question}
+                    change={(e) => handleChange(e, questionObj._id)}
+                    defaultVal={feedbackState[questionObj._id]?.answer || ''}
+                    error={errorState[questionObj._id]}
+                  />
+                );
+              }
+              return null;
+            })
+            :
+            <span>Loading...</span>
+          }
+          <Grid item xs={12}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: '36vw', mx: "auto" }}>
+              <Button variant="contained" onClick={handleSubmit} sx={{ fontsize: '0.75rem' }}>{toUpdate ? 'Update' : 'Submit'}</Button>
+              <Button variant="text" sx={{ fontsize: '0.75rem' }}>Clear Form</Button>
+            </Stack>
+          </Grid>
+        </Grid>
         {toUpdate && (
-          <Grid item xs={12} md={4} sx={{ position: 'sticky', top: '16px', alignSelf: 'flex-start' }}>
+          <Grid item xs={12} md={4} lg={5} sx={{ position: 'sticky', top: '17vh', alignSelf: 'flex-start' }}>
             <Stack spacing={2}>
               <UpdateQuestion question="Status" change={(e) => { handleUpdate(e, 'status') }} defaultVal={updateInfo.status ? updateInfo.status : ''} />
               <UpdateQuestion question="Recommendation" change={(e) => { handleUpdate(e, 'recommendation') }}
@@ -222,35 +231,34 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState }) 
             </Stack>
           </Grid>
         )}
-        <Grid item xs={12} sm={8} md={6} lg={12}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: '36vw', mx: "auto" }}>
-            <Button variant="contained" onClick={handleSubmit} sx={{ fontsize: '0.75rem' }}>{toUpdate ? 'Update' : 'Submit'}</Button>
-            <Button variant="text" sx={{ fontsize: '0.75rem' }}>Clear Form</Button>
-          </Stack>
-        </Grid>
       </Grid>
     </>
   );
 }
 
-export function Header({ volunteerName, eventName, eventDate }) {
+export function Header({ volunteerName, eventName, eventDate, title }) {
   return (
-    <Grid item xs={12} sm={8} md={6} lg={12}>
+    <Grid item xs={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
-        <CardHeader
-          title="Sadhguru Sahabhagi Trainees Feedback - Observation Phase" />
+        <CardHeader sx={{
+          backgroundColor: '#ad4511', fontWeight: 'bold', color: '#fff',
+          clipPath: 'polygon(0px 0px, 100% 0px, 100% 86%, 0% 98%)'
+        }}
+          title={title} />
         <CardContent>
-          <Typography>
-            Sadhguru Sahabhagi Name : {volunteerName}
-          </Typography>
-          <Stack direction="row" justifyContent="space-between">
-            <Typography variant="body2" component="div">
-              Event name: {eventName}
+          <Box>
+            <Typography>
+              Sadhguru Sahabhagi Name : {volunteerName}
             </Typography>
-            <Typography variant="body2" component="div">
-              Date : {eventDate}
-            </Typography>
-          </Stack>
+            <Stack direction="row" justifyContent="space-between">
+              <Typography variant="body2" component="div">
+                Event name: {eventName}
+              </Typography>
+              <Typography variant="body2" component="div">
+                Date : {eventDate}
+              </Typography>
+            </Stack>
+          </Box>
         </CardContent>
       </Card>
     </Grid>
@@ -259,13 +267,13 @@ export function Header({ volunteerName, eventName, eventDate }) {
 
 export function Question({ question, change, error, defaultVal }) {
   return (
-    <Grid item xs={12} sm={8} md={6} lg={12}>
+    <Grid item xs={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
+        <CardHeader sx={{ backgroundColor: '#b39167' }} title={question}
+          titleTypographyProps={{ fontSize: '1rem', color: '#fff' }}
+        />
         <CardContent sx={{ padding: 2 }}>
           <Stack direction="column" spacing={1}>
-            <Typography variant="subtitle1">
-              {question}
-            </Typography>
             <TextField required label="Your answer" variant="standard" onChange={change}
               error={error} helperText={error ? "This field is required" : ""}
               value={defaultVal ? defaultVal : ""} InputLabelProps={{ shrink: true }}></TextField>
@@ -276,16 +284,21 @@ export function Question({ question, change, error, defaultVal }) {
   );
 }
 
-function UpdateQuestion({ question, change, defaultVal }) {
+export function UpdateQuestion({ question, change, defaultVal }) {
   return (
-    <Card sx={{ maxWidth: 550, mx: "auto" }}>
+    <Card sx={{ maxWidth: '30vw', mx: "auto" }}>
+      <CardHeader sx={{ backgroundColor: '#b39167' }} title={question}
+        titleTypographyProps={{ fontSize: '1rem', color: '#fff' }}
+      />
       <CardContent sx={{ padding: 2 }}>
         <Stack direction="column" spacing={1}>
-          <Typography variant="subtitle1">
-            {question}
-          </Typography>
-          <TextField required label="Your answer" variant="standard" onChange={change}
-            value={defaultVal ? defaultVal : ""} InputLabelProps={{ shrink: true }}></TextField>
+          {question === 'Status' ?
+            <TextField label="Your answer" variant="outlined" onChange={change}
+              value={defaultVal ? defaultVal : ""} InputLabelProps={{ shrink: true }}></TextField>
+            :
+            <TextField label="Your answer" variant="outlined" onChange={change} multiline rows={3}
+              value={defaultVal ? defaultVal : ""} InputLabelProps={{ shrink: true }}></TextField>
+          }
         </Stack>
       </CardContent>
     </Card>
@@ -294,14 +307,14 @@ function UpdateQuestion({ question, change, defaultVal }) {
 
 function MultipleChoice({ question, options, selectedOptions, change, error }) {
   return (
-    <Grid item xs={12} sm={8} md={6} lg={12}>
+    <Grid item xs={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
+        <CardHeader sx={{ backgroundColor: '#b39167' }} title={question}
+          titleTypographyProps={{ fontSize: '1rem', color: '#fff' }}
+        />
         <Divider />
         <CardContent sx={{ padding: 2 }}>
           <Stack direction="column" spacing={1}>
-            <Typography variant="subtitle1">
-              {question}
-            </Typography>
             <FormControl component="fieldset">
               <FormGroup>
                 {options.map((choice) => (
@@ -323,14 +336,14 @@ function MultipleChoice({ question, options, selectedOptions, change, error }) {
 
 function SingleChoice({ question, options, selectedOption, change, error }) {
   return (
-    <Grid item xs={12} sm={8} md={6} lg={12}>
+    <Grid item xs={12} >
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
+        <CardHeader sx={{ backgroundColor: '#b39167' }} title={question}
+          titleTypographyProps={{ fontSize: '1rem', color: '#fff' }}
+        />
         <Divider />
         <CardContent sx={{ padding: 2 }}>
           <Stack direction="column" spacing={1}>
-            <Typography variant="subtitle1">
-              {question}
-            </Typography>
             <FormControl error={error}>
               <RadioGroup value={selectedOption} onChange={change}>
                 {options.map((choice) => (
