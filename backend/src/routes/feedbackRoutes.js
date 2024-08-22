@@ -168,13 +168,20 @@ router.post('/create', authenticateJwt, async (req, res) => {
         });
       }
       else if (question.type === 'single-choice') {
-        question.options.forEach((option) => {
-          if (option.name === answer.selectedOptions[0]) {
-            option.selected = true;
-            if (option.name === 'Other')
-              question.answer = answer.answer;
-          }
-        });
+        for (option of question.options) {
+          option.selected = false;
+        }
+        // question.options.forEach((option) => {
+        //   if (option.name === answer.selectedOptions[0]) {
+        //     option.selected = true;
+        //     if (option.name === 'Other')
+        //       question.answer = answer.answer;
+        //   }
+        // });
+        const selectedOption = question.options.find(option => option.name === answer.selectedOptions[0]);
+        selectedOption.selected = true;
+        if (selectedOption.name === 'Other')
+          question.answer = answer.answer;
       }
       else if (question.type === 'long-answer') {
         question.answer = answer.answer;
@@ -182,7 +189,7 @@ router.post('/create', authenticateJwt, async (req, res) => {
       await question.save();
     }
     feedback.givenBy = adminId;
-    if (toUpdate) {
+    if (updateInfo) {
       feedback[feedback.type].status = updateInfo?.status || '';
       feedback[feedback.type].recommendation = updateInfo?.recommendation || '';
     }

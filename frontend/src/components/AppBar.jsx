@@ -3,24 +3,30 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useAuth } from "../api/AuthContext";
 
 function Appbar() {
   const navigate = useNavigate();
   const [userName, setUserName] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
   useEffect(() => {
-    axios({
-      method: 'get',
-      url: 'http://localhost:3000/admin/me',
-      headers: {
-        "Authorization": "Bearer " + localStorage.getItem("token")
+    if (isAuthenticated) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        axios({
+          method: 'get',
+          url: 'http://localhost:3000/admin/me',
+          headers: {
+            "Authorization": "Bearer " + token
+          }
+        }).then((res) => {
+          setUserName(res.data.name);
+        }).catch((err) => {
+          console.error(err)
+        });
       }
-    }).then((res) => {
-      setUserName(res.data.name);
-      setIsLoggedIn(true);
-    })
-  }, [])
+    }
+  }, [isAuthenticated])
 
 
   function handleSignup() {
@@ -31,7 +37,7 @@ function Appbar() {
   }
   function handleLogout() {
     localStorage.removeItem("token");
-    setIsLoggedIn(false);
+    setIsAuthenticated(false);
     setUserName(null);
     window.location = '/admin/login';
   }
@@ -47,10 +53,10 @@ function Appbar() {
         <Container maxWidth="xl">
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Stack direction="row" spacing={1.5}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#ffffff', marginRight: '15px' }}>
-                Feedback-Collector
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#fff', marginRight: '15px' }}>
+                Sadhguru Sahabhagi
               </Typography>
-              {isLoggedIn ?
+              {isAuthenticated ?
                 <Stack direction="row" spacing={1.5}>
                   <Button variant="text" onClick={() => navigateEvent()}
                     sx={{
@@ -58,7 +64,7 @@ function Appbar() {
                         color: '#cc4521'
                       }
                     }}
-                  >EVENTS</Button>
+                  >PROGRAMS</Button>
                   <Divider orientation="vertical" flexItem sx={{ backgroundColor: '#dfd7c8' }} />
                   <Button variant="text" onClick={() => navigateDashboard()}
                     sx={{
@@ -66,15 +72,15 @@ function Appbar() {
                         color: '#cc4521'
                       }
                     }}
-                  >VOLUNTEER</Button>
+                  >VOLUNTEERS</Button>
                 </Stack>
                 : <></>
               }
             </Stack>
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <Stack direction="row" alignItems="center" >
                 <AccountCircleIcon sx={{ color: '#fff', marginRight: '5px' }} />
-                <Typography sx={{ marginRight: '20px', fontWeight: 'bold', color: '#ffffff' }}> {userName} </Typography>
+                <Typography sx={{ marginRight: '20px', fontWeight: 'bold', color: '#fff' }}> {userName} </Typography>
                 <Button variant="contained" onClick={handleLogout}
                   sx={{
                     backgroundColor: '#e91e63',
@@ -88,8 +94,17 @@ function Appbar() {
               </Stack>
             ) : (
               <Stack direction="row" spacing={1.5}>
-                <Button variant="contained" style={{ marginRight: 10 }} onClick={handleSignup}>Signup</Button>
-                <Button variant="contained" onClick={handleLogin}>Login</Button>
+                <Button variant="text" onClick={handleSignup} sx={{
+                  color: '#dfd7c8', fontWeight: 'bold', '&:hover': {
+                    color: '#cc4521'
+                  }
+                }}>Signup</Button>
+                <Divider orientation="vertical" flexItem sx={{ backgroundColor: '#dfd7c8' }} />
+                <Button variant="text" onClick={handleLogin} sx={{
+                  color: '#dfd7c8', fontWeight: 'bold', '&:hover': {
+                    color: '#cc4521'
+                  }
+                }}>Login</Button>
               </Stack>
             )}
           </Stack>
