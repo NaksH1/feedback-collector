@@ -1,33 +1,24 @@
-import { Alert, Autocomplete, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, Snackbar, Stack, TextField, createFilterOptions } from "@mui/material";
+import { Alert, Autocomplete, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, Snackbar, Stack, TextField, createFilterOptions } from "@mui/material";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { RestaurantOutlined } from "@mui/icons-material";
-
+import CloseIcon from '@mui/icons-material/Close';
 
 function AddVolunteer({ open, close, eventId, onSuccess }) {
   const [name, setName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [type, setType] = useState('training');
+  const [gender, setGender] = useState();
+  const [city, setCity] = useState('');
   const [remark, setRemark] = useState("");
-  const volunteerType = [
-    {
-      value: 'potential',
-      label: 'Potential Sahabhagi'
-    },
-    {
-      value: 'training',
-      label: 'Training Sahabhagi'
-    },
-    {
-      value: 'programVolunteer',
-      label: 'Program Volunteer Under Obs.'
-    }
-  ]
+  const volunteerType = [{ value: 'potential', label: 'Potential Sahabhagi' },
+  { value: 'training', label: 'Training Sahabhagi' },
+  { value: 'programVolunteer', label: 'Program Volunteer Under Obs.' }];
   const [value, setValue] = useState();
   const filter = createFilterOptions();
   const [volunteersList, setVolunteersList] = useState([]);
   const [alertPresent, setAlertPresent] = useState(false);
-
+  const volunteerGender = [{ value: 'Male', label: 'Male' },
+  { value: 'Female', label: 'Female' }];
   useEffect(() => {
     axios({
       method: 'get',
@@ -39,7 +30,9 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
       const vArray = await resp.data.volunteers.map((volunteer) => {
         return {
           name: volunteer.name,
-          mobileNumber: volunteer.mobileNumber
+          mobileNumber: volunteer.mobileNumber,
+          city: volunteer.city,
+          gender: volunteer.gender
         }
       });
       setVolunteersList(vArray);
@@ -48,8 +41,11 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
   useEffect(() => {
     if (value) {
       const volunteer = volunteersList.find(v => (v.mobileNumber === value.mobileNumber));
-      if (volunteer)
+      if (volunteer) {
         setName(volunteer.name);
+        setCity(volunteer.city);
+        setGender(volunteer.gender);
+      }
       else
         setName("");
     }
@@ -69,7 +65,9 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
         mobileNumber: value.mobileNumber,
         type: type,
         eventId: eventId,
-        remarks: remark
+        remarks: remark,
+        city: city,
+        gender: gender
       }
     }).then((res) => {
       onSuccess(res.data.volunteer)
@@ -101,14 +99,27 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
       <Dialog
         open={open}
         onClose={close}
+        maxWidth="xs"
+        fullWidth
         PaperProps={{
           component: 'form',
           onSubmit: (event) => { handleSubmit(event) }
         }}
       >
-        <DialogTitle>Add Volunteer</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} direction="column" alignItems="center" justifyContent="center" sx={{ minWidth: 400 }}>
+        <DialogTitle
+          sx={{ backgroundColor: '#b39167', color: '#fff', fontWeight: 'bold' }}
+        >Add Volunteer</DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={close}
+          sx={{
+            position: 'absolute', right: 8, top: 8, color: '#fff'
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent sx={{ padding: '20px' }}>
+          <Stack spacing={2} direction="column" alignItems="center" justifyContent="center" >
             <Autocomplete
               value={value}
               onChange={(event, newValue) => {
@@ -137,10 +148,8 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
 
                 return filtered;
               }}
-              selectOnFocus
-              clearOnBlur
-              handleHomeEndKeys
-              id="free-solo-with-text-demo"
+              selectOnFocus clearOnBlur
+              handleHomeEndKeys id="free-solo-with-text-demo"
               options={volunteersList}
               getOptionLabel={(option) => {
                 if (typeof option === 'string') {
@@ -162,7 +171,7 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
               fullWidth
               freeSolo
               renderInput={(params) => (
-                <TextField {...params} label="Mobile Number" />
+                <TextField {...params} label="Mobile Number" required />
               )}
             />
 
@@ -177,15 +186,30 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
               margin="dense"
               id="outlined-basic"
               label="Name"
-              variant="outlined">
-            </TextField>
-
+              variant="outlined" />
+            <Stack direction='row' spacing={1} justifyContent='center'>
+              <TextField
+                onChange={(e) => {
+                  setCity(e.target.value);
+                }}
+                sx={{ width: '13vw' }}
+                value={city} autoFocus
+                margin="dense" id="outlined-basic"
+                label="City" variant="outlined" />
+              <TextField key={gender}
+                autoFocus select id="outlined-basic" label="Gender" variant="outlined" value={gender}
+                onChange={(e) => { setGender(e.target.value); }}
+                sx={{ width: '13vw' }}
+              >
+                {volunteerGender.map((option) => {
+                  return <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                })}
+              </TextField>
+            </Stack>
             <TextField
-              autoFocus
-              required
-              select
-              fullWidth
-              id="outlined-basic"
+              autoFocus required select fullWidth id="outlined-basic"
               label="Type"
               variant="outlined"
               onChange={(e) => {
@@ -215,9 +239,14 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
             }
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={close}>Cancel</Button>
-          <Button type="submit">Submit</Button>
+        <DialogActions sx={{ justifyContent: 'center' }}>
+          <Button type="submit" sx={{
+            color: '#fff', backgroundColor: '#ad4511',
+            fontWeight: 'bold', marginBottom: '5px',
+            '&:hover': {
+              backgroundColor: '#0b055f'
+            }
+          }}>Submit</Button>
         </DialogActions>
       </Dialog>
     </>

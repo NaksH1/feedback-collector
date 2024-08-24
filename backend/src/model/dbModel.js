@@ -29,6 +29,8 @@ const eventSchema = new mongoose.Schema({
 const volunteerSchema = new mongoose.Schema({
   name: String,
   mobileNumber: String,
+  gender: { type: String, enums: ['Male', 'Female'] },
+  city: String,
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
   feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }]
 });

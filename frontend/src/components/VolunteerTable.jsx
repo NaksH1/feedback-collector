@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Button, Pagination, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import axios from "axios";
 import VolunteerDailog from "./VolunteerDailog";
 import AddIcon from '@mui/icons-material/Add';
@@ -10,19 +10,12 @@ function VolunteerTable({ event }) {
   const [volunteerDailog, setVolunteerDailog] = useState(false);
   const [selectedVolunteer, setSelectedVolunteer] = useState(null);
   const [addVolunteer, setAddVolunteer] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const volunteersPerPage = 5;
   const volunteerType = [
-    {
-      value: 'potential',
-      label: 'Potential Sahabhagi'
-    },
-    {
-      value: 'training',
-      label: 'Training Sahabhagi'
-    },
-    {
-      value: 'programVolunteer',
-      label: 'Program Volunteer Under Obs.'
-    }
+    { value: 'potential', label: 'Potential Sahabhagi' },
+    { value: 'training', label: 'Training Sahabhagi' },
+    { value: 'programVolunteer', label: 'Program Volunteer Under Obs.' }
   ]
   useEffect(() => {
     if (event && event._id) {
@@ -61,14 +54,32 @@ function VolunteerTable({ event }) {
     const volunteerTypeObj = volunteerType.find(v => (v.value === type));
     return volunteerTypeObj ? volunteerTypeObj.label : type;
   }
+
+  let indexOfLastVolunteer = currentPage * volunteersPerPage;
+  let indexOfFirstVolunteer = indexOfLastVolunteer - volunteersPerPage;
+  let currentVolunteers = volunteers.slice(indexOfFirstVolunteer, indexOfLastVolunteer);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
   return (
     <>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Typography variant="subtitle1">Volunteers</Typography>
-        <Button variant="contained" onClick={() => openAddVolunteer()}>Add</Button>
+        <Typography variant="subtitle1"
+          sx={{ fontWeight: 'bold' }}
+        >Volunteer Table</Typography>
+        <Button variant="contained" onClick={() => openAddVolunteer()}
+          sx={{
+            color: '#fff', backgroundColor: '#ad4511',
+            fontWeight: 'bold',
+            '&:hover': {
+              backgroundColor: '#0b055f'
+            }
+          }}
+        >Add</Button>
       </Stack>
       <TableContainer component={Paper} sx={{ marginTop: 2 }}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <Table maxWidth='lg' aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '30%', color: '#fff' }}>Name</TableCell>
@@ -78,7 +89,7 @@ function VolunteerTable({ event }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {volunteers.map((row) => (
+            {currentVolunteers.map((row) => (
               <TableRow onClick={() => openVolunteerDailog(row)}
                 key={row.volunteerId.mobileNumber}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -94,6 +105,14 @@ function VolunteerTable({ event }) {
           </TableBody>
         </Table>
       </TableContainer>
+      <Stack direction='row' justifyContent='center' sx={{ marginTop: '2vh' }}>
+        <Pagination
+          count={Math.ceil(volunteers.length / volunteersPerPage)}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+        />
+      </Stack>
       {selectedVolunteer && (
         <VolunteerDailog open={volunteerDailog} setOpen={closeVolunteerDailog} volunteer={selectedVolunteer} event={event} />
       )}

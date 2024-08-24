@@ -44,8 +44,8 @@ function Appbar() {
   function navigateEvent() {
     navigate('./events');
   }
-  function navigateDashboard() {
-    navigate('./volunteerdashboard');
+  function navigateVolunteersList() {
+    navigate('./volunteerslist');
   }
   return (
     <>
@@ -66,7 +66,7 @@ function Appbar() {
                     }}
                   >PROGRAMS</Button>
                   <Divider orientation="vertical" flexItem sx={{ backgroundColor: '#dfd7c8' }} />
-                  <Button variant="text" onClick={() => navigateDashboard()}
+                  <Button variant="text" onClick={() => navigateVolunteersList()}
                     sx={{
                       color: '#dfd7c8', fontWeight: 'bold', '&:hover': {
                         color: '#cc4521'

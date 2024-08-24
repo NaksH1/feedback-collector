@@ -6,17 +6,38 @@ const Volunteer = model.Volunteer;
 const Feedback = model.Feedback;
 const authenticateJwt = require('../middlewares/authentication.js');
 
+const eventList = {
+  'Bhava Spandana': 'https://static.sadhguru.org/d/46272/1650519638-website-thumbnail-yogameditation-bsp.jpg',
+  'Shoonya Intensive': 'https://static.sadhguru.org/d/46272/1650449300-website-thumbnail-yogameditation-shoonya.jpg',
+  'Inner Engineering Retreat': 'https://innerengineering.sadhguru.org/_next/static/media/IEO_social-share1200x630_ier.f4a2c643.jpg',
+  'Samyama': 'https://static.sadhguru.org/d/46272/1650517087-website-thumbnail-yogameditation-samyama.jpg',
+  'Samyama Sadhana': 'https://static.sadhguru.org/d/46272/1650454519-website-thumbnail-yogameditation-samyama-sadhana.jpg',
+  'Guru Pooja': 'https://static.sadhguru.org/d/46272/1650453435-website-thumbnail-yogameditation-gurupooja.jpg',
+  'HINAR': 'https://static.sadhguru.org/d/46272/1633207053-1633207051299.jpg',
+  'Insight': 'https://static.sadhguru.org/d/46272/1633491123-1633491122604.jpg',
+  'IAS Retreat': 'https://static.sadhguru.org/d/46272/1633198144-1633198143291.jpg',
+  'Lap of Master': 'https://static.sadhguru.org/d/46272/1651468994-isha_sadhguru_events_lapofmaster-thumbnail.jpg',
+  'Guru Purnima': 'https://static.sadhguru.org/d/46272/1652129109-guru-purnima-2019-14.jpg',
+  'Mahashivratri': 'https://static.sadhguru.org/d/46272/1633495270-1633495268886.jpg',
+  'Yantra Ceremony': 'https://static.sadhguru.org/d/46272/1641975872-yantra_module2.jpg',
+  'Other': 'https://static.sadhguru.org/d/46272/1650526600-website-thumbnail-yogameditation-training-landing.jpg'
+}
+
+router.get('/eventlist', authenticateJwt, async (req, res) => {
+  const eventListKeys = Object.keys(eventList);
+  if (eventListKeys)
+    res.status(200).json({ eventList: eventListKeys });
+  else
+    res.status(404).json({ message: 'Event list not found' })
+})
+
 router.post('/', authenticateJwt, async (req, res) => {
   try {
     const event = new Event({ ...req.body, createdBy: req.user.id, published: true, volunteers: [] });
-    if (event.name === 'Bhava Spandana')
-      event.image = "https://static.sadhguru.org/d/46272/1650519638-website-thumbnail-yogameditation-bsp.jpg";
-    else if (event.name === 'Shoonya Intensive')
-      event.image = "https://static.sadhguru.org/d/46272/1650449300-website-thumbnail-yogameditation-shoonya.jpg";
-    else if (event.name === 'Inner Engineering Retreat')
-      event.image = "https://innerengineering.sadhguru.org/_next/static/media/IEO_social-share1200x630_ier.f4a2c643.jpg";
+    if (eventList.hasOwnProperty(event.name))
+      event.image = eventList[event.name];
     else
-      event.image = "https://yt3.googleusercontent.com/DIw1OAZ5O-jdlTYbKTQcSfD9oiOruOOBilP4YqefzIs0-ZVrEDwD6izMmmze5CMGYYycb6Qdyg=s900-c-k-c0x00ffffff-no-rj";
+      event.image = eventList['Other'];
     await event.save();
     res.status(201).json({ message: "Event added", event });
   } catch (error) {
@@ -42,14 +63,10 @@ router.put('/:eventId', authenticateJwt, async (req, res) => {
   req.body.programCoordinator = req.body.programCoordinator.id;
   const event = await Event.findByIdAndUpdate(req.params.eventId, req.body, { new: true });
   if (event) {
-    if (event.name === 'Bhava Spandana')
-      event.image = "https://static.sadhguru.org/d/46272/1650519638-website-thumbnail-yogameditation-bsp.jpg";
-    else if (event.name === 'Shoonya Intensive')
-      event.image = "https://static.sadhguru.org/d/46272/1650449300-website-thumbnail-yogameditation-shoonya.jpg";
-    else if (event.name === 'Inner Engineering Retreat')
-      event.image = "https://innerengineering.sadhguru.org/_next/static/media/IEO_social-share1200x630_ier.f4a2c643.jpg";
+    if (eventList.hasOwnProperty(event.name))
+      event.image = eventList[event.name];
     else
-      event.image = "https://yt3.googleusercontent.com/DIw1OAZ5O-jdlTYbKTQcSfD9oiOruOOBilP4YqefzIs0-ZVrEDwD6izMmmze5CMGYYycb6Qdyg=s900-c-k-c0x00ffffff-no-rj";
+      event.image = eventList['Other'];
     await event.save();
     res.status(200).json({ message: "Event information updated", event });
   }
@@ -58,10 +75,13 @@ router.put('/:eventId', authenticateJwt, async (req, res) => {
 });
 
 router.post('/addVolunteer', authenticateJwt, async (req, res) => {
-  const { name, mobileNumber, type, eventId } = req.body;
+  const { name, mobileNumber, type, eventId, gender, city } = req.body;
   let volunteer = await Volunteer.findOne({ mobileNumber: mobileNumber });
   if (!volunteer) {
-    volunteer = new Volunteer({ name: name, mobileNumber: mobileNumber, createdBy: req.user.id, feedbacks: [] });
+    volunteer = new Volunteer({
+      name: name, mobileNumber: mobileNumber, createdBy: req.user.id,
+      gender: gender, city: city, feedbacks: []
+    });
     await volunteer.save();
   }
   const event = await Event.findById(eventId);

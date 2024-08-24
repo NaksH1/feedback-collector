@@ -22,6 +22,7 @@ router.get('/getList', async (req, res) => {
   const training = [];
   const potential = [];
   const programVolunteer = [];
+  const volunteerList = [];
   for (const volunteer of volunteers) {
     let existT = false;
     let existPV = false;
@@ -38,8 +39,34 @@ router.get('/getList', async (req, res) => {
         existP = true;
       }
     });
+    const feedback = volunteer.feedbacks[volunteer.feedbacks.length - 1];
+    let singleVolunteer = {
+      id: volunteer._id,
+      name: volunteer.name,
+      mobileNumber: volunteer.mobileNumber,
+      gender: volunteer.gender,
+      city: volunteer.city,
+    }
+    if (feedback) {
+      singleVolunteer.category = feedback.type === 'training' ? 'Training' : feedback.type === 'potential' ? 'Potential' : 'PV Under Obs.';
+      for (let i = volunteer.feedbacks.length - 1; i >= 0; i--) {
+        const feedbackI = volunteer.feedbacks[i];
+        if (feedbackI[feedbackI.type].status !== undefined) {
+          console.log(volunteer.name, feedbackI[feedbackI.type])
+          singleVolunteer.status = feedbackI[feedbackI.type].status;
+          break;
+        }
+      }
+      if (singleVolunteer.status === undefined)
+        singleVolunteer.status = 'Not Given';
+    }
+    else {
+      singleVolunteer.category = 'No Feedbacks';
+      singleVolunteer.status = 'No Feedbacks';
+    }
+    volunteerList.push(singleVolunteer);
   }
-  res.json({ training: training, programVolunteer: programVolunteer, potential: potential });
+  res.json({ training: training, programVolunteer: programVolunteer, potential: potential, volunteers: volunteerList });
 })
 
 router.get('/volunteerfulldetails/:volunteerId', authenticateJwt, async (req, res) => {
