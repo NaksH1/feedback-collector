@@ -4,6 +4,8 @@ import axios from "axios";
 import VolunteerDailog from "./VolunteerDailog";
 import AddIcon from '@mui/icons-material/Add';
 import AddVolunteer from "./AddVolunteer";
+import Papa from "papaparse";
+
 
 function VolunteerTable({ event }) {
   const [volunteers, setVolunteers] = useState([]);
@@ -11,6 +13,7 @@ function VolunteerTable({ event }) {
   const [selectedVolunteer, setSelectedVolunteer] = useState(null);
   const [addVolunteer, setAddVolunteer] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [eventId, setEventId] = useState('');
   const volunteersPerPage = 5;
   const volunteerType = [
     { value: 'potential', label: 'Potential Sahabhagi' },
@@ -19,7 +22,7 @@ function VolunteerTable({ event }) {
   ]
   useEffect(() => {
     if (event && event._id) {
-
+      setEventId(event._id);
       axios({
         method: "get",
         url: `http://localhost:3000/event/getVolunteer/${event._id}`,
@@ -58,28 +61,101 @@ function VolunteerTable({ event }) {
   let indexOfLastVolunteer = currentPage * volunteersPerPage;
   let indexOfFirstVolunteer = indexOfLastVolunteer - volunteersPerPage;
   let currentVolunteers = volunteers.slice(indexOfFirstVolunteer, indexOfLastVolunteer);
-
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
+  const handleCSVUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        complete: function(result) {
+          const { data, meta, errors } = result;
+          const headers = meta.fields;
+          const requiredHeaders = ['Name', 'Mobile Number', 'Type'];
+          const missingHeaders = [];
+          const allHeadersExist = requiredHeaders.reduce((acc, requiredHeader) => {
+            const exist = headers.includes(requiredHeader);
+            if (!exist)
+              missingHeaders.push(requiredHeader);
+            return acc && exist;
+          }, true);
+          if (!allHeadersExist) {
+            console.log('Missing Headers: ', missingHeaders);
+            alert(`The uploaded file is missing the following fields: ${missingHeaders}`)
+          }
+          const invalidRows = [];
+          data.forEach((row, index) => {
+            let mobileNumber = row['Mobile Number'].trim();
+            if (mobileNumber && mobileNumber.startsWith("'"))
+              mobileNumber = mobileNumber.substring(1);
+
+            const hasMobileNumber = mobileNumber !== '';
+            const hasName = row['Name']?.trim() !== '';
+            const type = row['Type']?.trim();
+            const hasType = type !== '' && (type === 'training' || type === 'programVolunteer');
+            if (!hasMobileNumber || !hasName || !hasType)
+              invalidRows.push(index + 2);
+            return {
+              ...row,
+              'Mobile Number': mobileNumber
+            }
+          });
+          if (invalidRows.length > 0) {
+            alert(`The following rows have invalid data: ${invalidRows}`);
+            console.log(`Invalid rows: ${invalidRows}`)
+          }
+          else {
+            console.log('All rows are valid', data);
+            const volunteersList = data;
+            axios({
+              method: 'post',
+              url: 'http://localhost:3000/event/addVolunteerList',
+              headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+              },
+              data: {
+                volunteersList: volunteersList,
+                eventId: eventId
+              }
+            }).then((resp) => {
+              console.log(resp.data)
+              window.location.reload();
+            })
+          }
+        },
+        error: function(error) {
+          console.error("Error parsing CSV file: ", error);
+          alert("There was an error processing the CSV file.");
+        }
+      })
+    }
+  }
+
   return (
     <>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Typography variant="subtitle1"
           sx={{ fontWeight: 'bold' }}
         >Volunteer Table</Typography>
-        <Button variant="contained" onClick={() => openAddVolunteer()}
-          sx={{
-            color: '#fff', backgroundColor: '#ad4511',
-            fontWeight: 'bold',
-            '&:hover': {
-              backgroundColor: '#0b055f'
-            }
-          }}
-        >Add</Button>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Button variant="contained" component="label" sx={{ fontWeight: 'bold' }}>
+            Import CSV
+            <input type="file" accept=".csv" hidden onChange={handleCSVUpload} />
+          </Button>
+          <Button variant="contained" onClick={() => openAddVolunteer()}
+            sx={{
+              color: '#fff', backgroundColor: '#ad4511',
+              fontWeight: 'bold',
+              '&:hover': {
+                backgroundColor: '#0b055f'
+              }
+            }}
+          >Add</Button>
+        </Stack>
       </Stack>
       <TableContainer component={Paper} sx={{ marginTop: 2 }}>
-        <Table maxWidth='lg' aria-label="simple table">
+        <Table aria-label="simple table" key={volunteers}>
           <TableHead>
             <TableRow>
               <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '30%', color: '#fff' }}>Name</TableCell>

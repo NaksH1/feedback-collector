@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const model = require('../model/dbModel');
+const dayjs = require('dayjs');
+const isoWeek = require('dayjs/plugin/isoWeek');
+dayjs.extend(isoWeek);
 const Event = model.Event;
 const Volunteer = model.Volunteer;
 const Feedback = model.Feedback;
@@ -48,7 +51,33 @@ router.post('/', authenticateJwt, async (req, res) => {
 
 router.get('/', authenticateJwt, async (req, res) => {
   const events = await Event.find({}).populate({ path: 'programCoordinator', select: 'name' });
-  res.json({ events: events });
+  const dates = events.map((event) => (event.date));
+  const yearWeekMap = dates.reduce((acc, dateStr) => {
+    const date = dayjs(dateStr);
+    const year = date.year();
+    const week = date.isoWeek();
+    if (!acc[year])
+      acc[year] = new Set();
+    acc[year].add(week);
+    return acc;
+  }, {});
+
+  const yearWeekOptions = Object.entries(yearWeekMap).map(([year, weeks]) => {
+    return {
+      year: year,
+      weeks: Array.from(weeks).sort((a, b) => a - b)
+    };
+  });
+
+  const dropdownOptions = yearWeekOptions.map(({ year, weeks }) => ({
+    year: year,
+    weeks: weeks.map((week) => {
+      const startOfWeek = dayjs().year(year).isoWeek(week).startOf('isoWeek');
+      const endOfWeek = startOfWeek.endOf('isoWeek');
+      return `${startOfWeek.format('D MMM YY')} - ${endOfWeek.format('D MMM YY')}`;
+    })
+  }));
+  res.json({ events: events, dropdownOptions: dropdownOptions });
 });
 
 router.get('/:eventId', authenticateJwt, async (req, res) => {
@@ -72,6 +101,38 @@ router.put('/:eventId', authenticateJwt, async (req, res) => {
   }
   else
     res.status(404).json({ message: "Event not found" });
+});
+
+router.post('/addVolunteerList', authenticateJwt, async (req, res) => {
+  const { volunteersList, eventId } = req.body;
+  const volunteersAdded = [];
+  const event = await Event.findById(eventId);
+  if (!event)
+    return res.status(404).json({ message: 'Event not found' });
+  for (const singleVolunteer of volunteersList) {
+    const mobileNumber = singleVolunteer['Mobile Number'];
+    let volunteer = await Volunteer.findOne({ mobileNumber: mobileNumber });
+    if (!volunteer) {
+      volunteer = new Volunteer({
+        name: singleVolunteer['Name'],
+        mobileNumber: singleVolunteer['Mobile Number'],
+        gender: singleVolunteer['Gender'] || '',
+        city: singleVolunteer['City'] || '',
+        createdBy: req.user.id,
+        feedbacks: []
+      });
+      await volunteer.save();
+    }
+    const volunteerExistsInEvent = event.volunteers.some(v => v.volunteerId.equals(volunteer._id));
+
+    if (!volunteerExistsInEvent) {
+      event.volunteers.push({ volunteerId: volunteer._id, type: singleVolunteer['Type'] });
+      volunteersAdded.push(volunteer);
+    }
+  }
+  await event.save();
+  const populatedVolunteersAdded = await Volunteer.populate(volunteersAdded, { path: 'createdBy', select: 'name' });
+  res.status(201).json({ message: "Volunteer list added to event", volunteersAdded: populatedVolunteersAdded });
 });
 
 router.post('/addVolunteer', authenticateJwt, async (req, res) => {

@@ -11,6 +11,25 @@ function UpdateCard({ event, setEvent }) {
   const [programCoordinator, setProgramCoordinator] = useState(null);
   const [inputValue, setInputValue] = useState('');
   const [options, setOptions] = useState([]);
+  const [programName, setProgramName] = useState([])
+  useEffect(() => {
+    axios({
+      method: 'get',
+      url: 'http://localhost:3000/event/eventlist',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      }
+    }).then((resp) => {
+      if (programName.length < 14) {
+        for (const event of resp.data.eventList) {
+          programName.push({
+            value: event,
+            label: event
+          })
+        }
+      }
+    });
+  }, [event]);
 
   useEffect(() => {
     if (event) {
@@ -18,9 +37,6 @@ function UpdateCard({ event, setEvent }) {
       setDate(dayjs(event.date));
       setProgramCoordinator(event.programCoordinator || null);
     }
-  }, [event]);
-
-  useEffect(() => {
     axios({
       method: 'get',
       url: 'http://localhost:3000/admin/',
@@ -39,11 +55,8 @@ function UpdateCard({ event, setEvent }) {
     });
   }, [event]);
 
-  const programNames = [
-    { value: 'Bhava Spandana', label: 'Bhava Spandana' },
-    { value: 'Shoonya Intensive', label: 'Shoonya Intensive' },
-    { value: 'Inner Engineering Retreat', label: 'Inner Engineering Retreat' }
-  ];
+
+
 
   const updateEvent = (e) => {
     e.preventDefault();
@@ -68,20 +81,28 @@ function UpdateCard({ event, setEvent }) {
   };
 
   return (
-    <Stack spacing={2} direction="column" alignItems="center" justifyContent="center" sx={{ marginTop: 12, marginLeft: 20, width: 350 }}>
+    <Stack spacing={2} direction="column" alignItems="center" justifyContent="center" sx={{ width: 350, marginTop: '4vh', marginLeft: '4vw' }}>
       <TextField
-        onChange={(e) => setName(e.target.value)}
-        fullWidth
+        value={name}
+        onChange={(e) => { setName(e.target.value) }}
         select
+        fullWidth
+        id="outlined-controlled"
         label="Name"
         variant="outlined"
-        value={name}
+        SelectProps={{
+          MenuProps: {
+            PaperProps: {
+              style: { maxHeight: '20vh', overflowY: 'auto' }
+            }
+          }
+        }}
       >
-        {programNames.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
+        {programName?.map((option) => {
+          return <MenuItem key={option.value} value={option.value}>
             {option.label}
           </MenuItem>
-        ))}
+        })}
       </TextField>
       <DatePicker
         fullWidth

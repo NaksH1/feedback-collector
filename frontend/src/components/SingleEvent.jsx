@@ -26,13 +26,13 @@ function SingleEvent() {
     <>
       <Container maxWidth="lg">
         {/* <GrayTopper name={events.name} /> */}
-        <Grid container>
+        <Grid container rowSpacing={1}>
           <Grid item lg={6} md={12} sm={12}>
-            <UpdateCard event={events} setEvent={setEvents} />
+            <UpdateCard sx={{ display: "flex", justifyContent: "center", height: '100%' }} event={events} setEvent={setEvents} />
           </Grid>
           <Grid item lg={6} md={12} sm={12}>
             {events ?
-              <Events sx={{ display: "flex", justifyContent: "center" }} event={events} />
+              <Events sx={{ display: "flex", justifyContent: "center", height: '100%' }} event={events} />
               : "Loading.."}
           </Grid>
           <Grid item lg={12} md={12} sm={12}>

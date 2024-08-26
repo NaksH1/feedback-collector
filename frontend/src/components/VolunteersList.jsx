@@ -26,13 +26,13 @@ function VolunteersList() {
     })
   }, [])
   const columns = [
-    { field: 'id', headerName: 'ID', width: 90, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>ID</strong> },
-    { field: 'name', headerName: 'Name', width: 150, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>Name</strong> },
-    { field: 'mobileNumber', headerName: 'Mobile Number', width: 150, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>Mobile Number</strong> },
-    { field: 'gender', headerName: 'Gender', width: 90, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>Gender</strong> },
+    { field: 'id', headerName: 'ID', width: 120, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>ID</strong> },
+    { field: 'name', headerName: 'Name', width: 170, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>Name</strong> },
+    { field: 'mobileNumber', headerName: 'Mobile Number', width: 170, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>Mobile Number</strong> },
+    { field: 'gender', headerName: 'Gender', width: 100, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>Gender</strong> },
     { field: 'city', headerName: 'City', width: 150, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>City</strong> },
-    { field: 'status', headerName: 'Status', width: 250, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>Status</strong> },
-    { field: 'category', headerName: 'Category', width: 150, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>Category</strong> }
+    { field: 'status', headerName: 'Status', width: 220, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>Status</strong> },
+    { field: 'category', headerName: 'Category', width: 220, headerClassName: 'volunteer-table--header', renderHeader: () => <strong>Category</strong> }
   ];
   const rows = volunteerList.map((volunteer) => ({
     id: volunteer.id,

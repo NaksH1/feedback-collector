@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
 
 const eventSchema = new mongoose.Schema({
   name: String,
-  date: String,
+  date: Date,
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
   programCoordinator: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
   volunteers: [{

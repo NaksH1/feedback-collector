@@ -52,7 +52,6 @@ router.get('/getList', async (req, res) => {
       for (let i = volunteer.feedbacks.length - 1; i >= 0; i--) {
         const feedbackI = volunteer.feedbacks[i];
         if (feedbackI[feedbackI.type].status !== undefined) {
-          console.log(volunteer.name, feedbackI[feedbackI.type])
           singleVolunteer.status = feedbackI[feedbackI.type].status;
           break;
         }

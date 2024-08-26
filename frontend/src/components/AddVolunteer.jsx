@@ -46,8 +46,11 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
         setCity(volunteer.city);
         setGender(volunteer.gender);
       }
-      else
+      else {
         setName("");
+        setCity("");
+        setGender("");
+      }
     }
     else
       setName("");

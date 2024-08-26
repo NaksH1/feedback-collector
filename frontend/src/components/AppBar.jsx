@@ -5,6 +5,7 @@ import axios from "axios";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useAuth } from "../api/AuthContext";
 
+
 function Appbar() {
   const navigate = useNavigate();
   const [userName, setUserName] = useState(null);
@@ -57,7 +58,7 @@ function Appbar() {
                 Sadhguru Sahabhagi
               </Typography>
               {isAuthenticated ?
-                <Stack direction="row" spacing={1.5}>
+                <Stack direction={{ xl: 'column', sm: 'row' }} alignItems={{ xl: 'flex-start', sm: 'center' }} spacing={1.5}>
                   <Button variant="text" onClick={() => navigateEvent()}
                     sx={{
                       color: '#dfd7c8', fontWeight: 'bold', '&:hover': {
@@ -80,7 +81,7 @@ function Appbar() {
             {isAuthenticated ? (
               <Stack direction="row" alignItems="center" >
                 <AccountCircleIcon sx={{ color: '#fff', marginRight: '5px' }} />
-                <Typography sx={{ marginRight: '20px', fontWeight: 'bold', color: '#fff' }}> {userName} </Typography>
+                <Typography sx={{ marginRight: '20px', fontWeight: 'bold', color: '#fff' }} noWrap> {userName} </Typography>
                 <Button variant="contained" onClick={handleLogout}
                   sx={{
                     backgroundColor: '#e91e63',

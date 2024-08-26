@@ -137,6 +137,7 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
           });
           console.log('Feedback Updated');
           alert('Feedback Updated')
+          navigate(-1)
         }
       }
       catch (err) {

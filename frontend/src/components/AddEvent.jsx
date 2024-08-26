@@ -5,7 +5,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import CloseIcon from '@mui/icons-material/Close';
 
-function AddEvent({ open, setOpen, setEvents, handleClose, setEventAdded }) {
+function AddEvent({ open, setOpen, setEvents, handleClose, setEventAdded, filterEvents, selectedYear, selectedWeek }) {
   const [name, setName] = useState('Bhava Spandana');
   const [nameIfOther, setNameIfOther] = useState('');
   const [date, setDate] = useState(dayjs());
@@ -59,7 +59,11 @@ function AddEvent({ open, setOpen, setEvents, handleClose, setEventAdded }) {
     }).then((resp) => {
       handleClose();
       setEventAdded(true);
-      setEvents((preEvent) => [...preEvent, resp.data.event]);
+      setEvents((prevEvents) => {
+        const updatedEvents = [...prevEvents, resp.data.event];
+        filterEvents(selectedYear, selectedWeek, updatedEvents);
+        return updatedEvents;
+      });
     })
   }
   const handleOtherNameChange = (e) => {
