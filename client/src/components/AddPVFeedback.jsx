@@ -28,10 +28,15 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
       }
     }).then((resp) => {
       setQuestionnaire(resp.data?.feedback[type].questionnaire);
+      setUpdateInfo((preState) => ({
+        ...preState,
+        status: resp.data.feedback[type].status,
+        recommendation: resp.data.feedback[type].recommendation
+      }))
     });
     if (viewFeedback && viewFeedbackState)
       setFeedbackState(viewFeedbackState);
-  }, []);
+  }, [type, volunteerId, event._id, viewFeedback, viewFeedbackState]);
 
   const formatDate = (date) => {
     if (!date) return '';
