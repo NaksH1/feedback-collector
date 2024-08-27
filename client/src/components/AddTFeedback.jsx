@@ -36,7 +36,7 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState }) 
     if (viewFeedback && viewFeedbackState) {
       setFeedbackState(viewFeedbackState);
     }
-  }, []);
+  }, [type, volunteerId, event._id, viewFeedback, viewFeedbackState]);
 
   const formatDate = (date) => {
     if (!date) return '';
