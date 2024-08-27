@@ -10,7 +10,7 @@ function Signup() {
   const handleSignup = () => {
     axios({
       method: 'post',
-      url: `${process.env.REACT_APP_BACKEND_URL}/admin/signup`,
+      url: `${import.meta.env.VITE_BACKEND_URL}/admin/signup`,
       headers: {
         'Content-Type': 'application/json'
       },

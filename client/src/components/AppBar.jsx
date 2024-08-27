@@ -16,7 +16,7 @@ function Appbar() {
       if (token) {
         axios({
           method: 'get',
-          url: `${process.env.REACT_APP_BACKEND_URL}/admin/me`,
+          url: `${import.meta.env.VITE_BACKEND_URL}/admin/me`,
           headers: {
             "Authorization": "Bearer " + token
           }

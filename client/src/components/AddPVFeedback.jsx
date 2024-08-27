@@ -16,10 +16,9 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
   const [updateInfo, setUpdateInfo] = useState({});
 
   useEffect(() => {
-    const apiUrl = process.env.REACT_APP_BACKEND_URL;
     axios({
       method: 'get',
-      url: `${process.env.REACT_APP_BACKEND_URL}/feedback/questions/${type}`,
+      url: `${import.meta.env.VITE_BACKEND_URL}/feedback/questions/${type}`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem('token')
       },
@@ -109,7 +108,7 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
         if (!toUpdate) {
           const resp = await axios({
             method: 'post',
-            url: `${process.env.REACT_APP_BACKEND_URL}/feedback/create`,
+            url: `${import.meta.env.VITE_BACKEND_URL}/feedback/create`,
             headers: {
               'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
@@ -125,7 +124,7 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
         } else {
           const resp = await axios({
             method: 'post',
-            url: `${process.env.REACT_APP_BACKEND_URL}/feedback/create`,
+            url: `${import.meta.env.VITE_BACKEND_URL}/feedback/create`,
             headers: {
               'Authorization': 'Bearer ' + localStorage.getItem('token')
             },

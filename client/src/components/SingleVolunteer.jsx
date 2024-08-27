@@ -18,7 +18,7 @@ function SingleVolunteer() {
   useEffect(() => {
     axios({
       method: 'get',
-      url: `${process.env.REACT_APP_BACKEND_URL}/volunteer/volunteerfulldetails/${volunteerId}`,
+      url: `${import.meta.env.VITE_BACKEND_URL}/volunteer/volunteerfulldetails/${volunteerId}`,
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('token')
       }
@@ -43,7 +43,7 @@ function SingleVolunteer() {
     try {
       const resp = await axios({
         method: 'delete',
-        url: `${process.env.REACT_APP_BACKEND_URL}/feedback/${feedbackId}`,
+        url: `${import.meta.env.VITE_BACKEND_URL}/feedback/${feedbackId}`,
         headers: {
           "Authorization": "Bearer " + localStorage.getItem('token')
         }
@@ -64,14 +64,14 @@ function SingleVolunteer() {
     try {
       const resp = await axios({
         method: 'put',
-        url: `${process.env.REACT_APP_BACKEND_URL}/feedback/recover/${deletedFeedbackId}`,
+        url: `${import.meta.env.VITE_BACKEND_URL}/feedback/recover/${deletedFeedbackId}`,
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("token")
         }
       })
       const restored = await axios({
         method: 'get',
-        url: `${process.env.REACT_APP_BACKEND_URL}/feedback/full/${deletedFeedbackId}`,
+        url: `${import.meta.env.VITE_BACKEND_URL}/feedback/full/${deletedFeedbackId}`,
         headers: {
           "Authorization": "Bearer " + localStorage.getItem('token')
         }

@@ -25,7 +25,7 @@ function VolunteerTable({ event }) {
       setEventId(event._id);
       axios({
         method: "get",
-        url: `${process.env.REACT_APP_BACKEND_URL}/event/getVolunteer/${event._id}`,
+        url: `${import.meta.env.VITE_BACKEND_URL}/event/getVolunteer/${event._id}`,
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("token")
         }
@@ -110,7 +110,7 @@ function VolunteerTable({ event }) {
             const volunteersList = data;
             axios({
               method: 'post',
-              url: 'http://localhost:3000/event/addVolunteerList',
+              url: `${import.meta.env.VITE_BACKEND_URL}/event/addVolunteerList`,
               headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
               },

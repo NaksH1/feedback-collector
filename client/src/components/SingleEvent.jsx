@@ -14,7 +14,7 @@ function SingleEvent() {
   useEffect(() => {
     axios({
       method: "get",
-      url: `${process.env.REACT_APP_BACKEND_URL}/event/${eventId}`,
+      url: `${import.meta.env.VITE_BACKEND_URL}/event/${eventId}`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }

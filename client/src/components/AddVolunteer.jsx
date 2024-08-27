@@ -22,7 +22,7 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
   useEffect(() => {
     axios({
       method: 'get',
-      url: `${process.env.REACT_APP_BACKEND_URL}/volunteer`,
+      url: `${import.meta.env.VITE_BACKEND_URL}/volunteer`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }
@@ -59,7 +59,7 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
     e.preventDefault();
     axios({
       method: "post",
-      url: `${process.env.REACT_APP_BACKEND_URL}/event/addVolunteer`,
+      url: `${import.meta.env.VITE_BACKEND_URL}/event/addVolunteer`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       },
