@@ -23,6 +23,7 @@ function Event() {
   const eventsPerPage = 8;
   const fetchEvents = () => {
     const apiUrl = process.env.REACT_APP_BACKEND_URL;
+    console.log(apiUrl);
     axios({
       method: "get",
       url: `${process.env.REACT_APP_BACKEND_URL}/event`,
