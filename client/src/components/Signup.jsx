@@ -26,56 +26,58 @@ function Signup() {
     });
   }
   return (
-    <>
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        marginTop: 200,
-        marginBotom: 40
-      }}>
-        <Typography variant="h5">
-          Welcome, please signup below
-        </Typography>
-      </div>
-      <br />
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        flexDirection: "row"
-      }}>
-        <Card variant={"outlined"} style={{ width: 400, padding: 20 }}>
-          <Stack spacing={2}>
-            <TextField
-              onChange={(e) => {
-                setName(e.target.value);
-              }}
-              fullWidth={true}
-              id="outlined-basic"
-              label="Name"
-              variant={"outlined"} />
-            <TextField
-              onChange={(e) => {
-                setEmail(e.target.value);
-              }}
-              fullWidth={true}
-              id="outlined-basic"
-              label="Email"
-              variant={"outlined"} />
-            <TextField
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-              fullWidth={true}
-              id="outlined-basic"
-              label="Password"
-              variant={"outlined"}
-              type={"password"} />
-            <Button size={"large"} variant="contained" onClick={handleSignup}>SIGNUP</Button>
-          </Stack>
-        </Card>
+    <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '28vh', position: 'relative' }}>
+      <Stack alignItems="center">
+        <Box sx={{
+          width: 413,
+          backgroundColor: '#b39167',
+          padding: '10px 0',
+          textAlign: 'center',
+          borderRadius: '4px 4px 0 0',
+          zIndex: 1,
+          position: 'relative'
+        }}>
+          <Typography variant="h6" sx={{ color: '#fff', fontWeight: 'bold' }}>
+            Signup
+          </Typography>
+        </Box>
+        <Card variant="outlined" sx={{ width: 380, padding: 2, marginTop: '-20px', zIndex: 0 }}>
+          <CardContent sx={{ textAlign: 'center', paddingTop: 4 }}>
+            <Stack direction='column' spacing={2} justifyContent='center'>
+              <TextField
+                onChange={(e) => setName(e.target.value)}
+                fullWidth={true}
+                label="Name"
+                variant="outlined"
+              />
+              <TextField
+                onChange={(e) => setEmail(e.target.value)}
+                fullWidth={true}
+                label="Email"
+                variant="outlined"
+              />
+              <TextField
+                onChange={(e) => setPassword(e.target.value)}
+                fullWidth={true}
+                label="Password"
+                variant="outlined"
+                type="password"
+              />
+              <Button size="large" variant="contained" sx={{
+                marginTop: 2, color: '#fff', backgroundColor: '#ad4511',
+                fontWeight: 'bold', marginBottom: '5px',
+                '&:hover': {
+                  backgroundColor: '#0b055f'
+                }
+              }} onClick={handleSignup}>
+                SIGNUP
+              </Button>
+            </Stack>
+          </CardContent>
 
-      </div>
-    </>
+        </Card>
+      </Stack>
+    </Box>
   )
 }
 
