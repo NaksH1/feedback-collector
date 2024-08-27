@@ -22,7 +22,7 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
     // console.log(volunteer);
     axios({
       method: "get",
-      url: `http://localhost:3000/feedback/${volunteer.volunteerId._id}`,
+      url: `${process.env.REACT_APP_BACKEND_URL}/feedback/${volunteer.volunteerId._id}`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }
@@ -54,7 +54,7 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
     try {
       const resp = await axios({
         method: 'delete',
-        url: `http://localhost:3000/feedback/${feedbackId}`,
+        url: `${process.env.REACT_APP_BACKEND_URL}/feedback/${feedbackId}`,
         headers: {
           "Authorization": "Bearer " + localStorage.getItem('token')
         }
@@ -76,14 +76,14 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
     try {
       const resp = await axios({
         method: 'put',
-        url: `http://localhost:3000/feedback/recover/${deletedFeedbackId}`,
+        url: `${process.env.REACT_APP_BACKEND_URL}/feedback/recover/${deletedFeedbackId}`,
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("token")
         }
       })
       const restored = await axios({
         method: 'get',
-        url: `http://localhost:3000/feedback/full/${deletedFeedbackId}`,
+        url: `${process.env.REACT_APP_BACKEND_URL}/feedback/full/${deletedFeedbackId}`,
         headers: {
           "Authorization": "Bearer " + localStorage.getItem('token')
         }

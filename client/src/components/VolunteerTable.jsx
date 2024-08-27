@@ -25,7 +25,7 @@ function VolunteerTable({ event }) {
       setEventId(event._id);
       axios({
         method: "get",
-        url: `http://localhost:3000/event/getVolunteer/${event._id}`,
+        url: `${process.env.REACT_APP_BACKEND_URL}/event/getVolunteer/${event._id}`,
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("token")
         }

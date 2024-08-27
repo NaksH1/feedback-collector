@@ -17,7 +17,7 @@ function AddEvent({ open, setOpen, setEvents, handleClose, setEventAdded, filter
   useEffect(() => {
     axios({
       method: 'get',
-      url: 'http://localhost:3000/event/eventlist',
+      url: `${process.env.REACT_APP_BACKEND_URL}/event/eventlist`,
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('token')
       }
@@ -35,7 +35,7 @@ function AddEvent({ open, setOpen, setEvents, handleClose, setEventAdded, filter
     })
     axios({
       method: 'get',
-      url: 'http://localhost:3000/admin/',
+      url: `${process.env.REACT_APP_BACKEND_URL}/admin/`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }
@@ -47,7 +47,7 @@ function AddEvent({ open, setOpen, setEvents, handleClose, setEventAdded, filter
   const handleSubmit = () => {
     axios({
       method: "post",
-      url: "http://localhost:3000/event",
+      url: `${process.env.REACT_APP_BACKEND_URL}/event`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       },

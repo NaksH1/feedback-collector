@@ -10,7 +10,7 @@ function Signup() {
   const handleSignup = () => {
     axios({
       method: 'post',
-      url: 'http://localhost:3000/admin/signup',
+      url: `${process.env.REACT_APP_BACKEND_URL}/admin/signup`,
       headers: {
         'Content-Type': 'application/json'
       },

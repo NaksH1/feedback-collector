@@ -12,7 +12,7 @@ function Login() {
   const handleLogin = () => {
     axios({
       method: 'post',
-      url: 'http://localhost:3000/admin/login',
+      url: `${process.env.REACT_APP_BACKEND_URL}/admin/login`,
       headers: {
         "Content-Type": "application/json",
         username: email,

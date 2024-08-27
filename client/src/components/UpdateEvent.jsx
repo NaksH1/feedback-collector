@@ -15,7 +15,7 @@ function UpdateCard({ event, setEvent }) {
   useEffect(() => {
     axios({
       method: 'get',
-      url: 'http://localhost:3000/event/eventlist',
+      url: `${process.env.REACT_APP_BACKEND_URL}/event/eventlist`,
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('token')
       }
@@ -39,7 +39,7 @@ function UpdateCard({ event, setEvent }) {
     }
     axios({
       method: 'get',
-      url: 'http://localhost:3000/admin/',
+      url: `${process.env.REACT_APP_BACKEND_URL}/admin/`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }
@@ -69,7 +69,7 @@ function UpdateCard({ event, setEvent }) {
     setEvent(updatedEvent);
     axios({
       method: "put",
-      url: `http://localhost:3000/event/${event._id}`,
+      url: `${process.env.REACT_APP_BACKEND_URL}/event/${event._id}`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       },

@@ -19,7 +19,7 @@ function ViewFeedback() {
       try {
         const fetchResult = await axios({
           method: 'get',
-          url: `http://localhost:3000/feedback/view/${feedbackId}`,
+          url: `${process.env.REACT_APP_BACKEND_URL}/feedback/view/${feedbackId}`,
           headers: {
             "Authorization": "Bearer " + localStorage.getItem("token")
           }
@@ -169,7 +169,7 @@ function ViewPotentialFeedback({ otherInfo, feedback }) {
     }
     const resp = await axios({
       method: 'put',
-      url: `http://localhost:3000/feedback/${feedback._id}`,
+      url: `${process.env.REACT_APP_BACKEND_URL}/feedback/${feedback._id}`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       },

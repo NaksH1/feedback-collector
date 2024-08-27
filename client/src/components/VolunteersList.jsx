@@ -14,7 +14,7 @@ function VolunteersList() {
   useEffect(() => {
     axios({
       method: 'get',
-      url: 'http://localhost:3000/volunteer/getList',
+      url: `${process.env.REACT_APP_BACKEND_URL}/volunteer/getList`,
       headers: {
         'Authorization': 'Bearer ' + localStorage.getItem('token')
       }

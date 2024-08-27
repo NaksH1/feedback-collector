@@ -16,7 +16,7 @@ function Appbar() {
       if (token) {
         axios({
           method: 'get',
-          url: 'http://localhost:3000/admin/me',
+          url: `${process.env.REACT_APP_BACKEND_URL}/admin/me`,
           headers: {
             "Authorization": "Bearer " + token
           }
