@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb+srv://nakshsinghhh1:CNP2DaBXwJLf5ZYC@demo.vlottuc.mongodb.net/');
+const MONGO_URL = process.env.MONGO_URL || 'mongodb+srv://nakshsinghhh1:CNP2DaBXwJLf5ZYC@demo.vlottuc.mongodb.net/';
+mongoose.connect(MONGO_URL);
+
 const adminSchema = new mongoose.Schema({
   username: String,
   password: String,

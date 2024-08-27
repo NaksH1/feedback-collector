@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express');
 const app = express();
 const adminRoutes = require('./src/routes/adminRoutes.js');
@@ -11,7 +12,7 @@ const { Questionnaire } = require('./src/model/dbModel.js');
 app.use(cors());
 app.use(express.json());
 
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
   res.json({ message: "ok" });
@@ -34,8 +35,8 @@ app.use((err, req, res, next) => {
   return;
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}`)
 });
 
 const startServer = async (Questionnaire) => {
