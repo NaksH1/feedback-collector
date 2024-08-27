@@ -22,11 +22,11 @@ function Event() {
   const [selectedWeek, setSelectedWeek] = useState('');
   const eventsPerPage = 8;
   const fetchEvents = () => {
-    const apiUrl = process.env.REACT_APP_BACKEND_URL;
+    const apiUrl = import.meta.env.VITE_BACKEND_URL;
     console.log(apiUrl);
     axios({
       method: "get",
-      url: `${process.env.REACT_APP_BACKEND_URL}/event`,
+      url: `${import.meta.env.VITE_BACKEND_URL}/event`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }
