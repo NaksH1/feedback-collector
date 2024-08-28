@@ -7,7 +7,7 @@ dayjs.extend(isoWeek);
 const Event = model.Event;
 const Volunteer = model.Volunteer;
 const Feedback = model.Feedback;
-const authenticateJwt = require('../middlewares/authentication.js');
+const authenticateJwt = require('../middlewares/authentication.js').authenticateJwt;
 
 const eventList = {
   'Bhava Spandana': 'https://static.sadhguru.org/d/46272/1650519638-website-thumbnail-yogameditation-bsp.jpg',
@@ -50,7 +50,11 @@ router.post('/', authenticateJwt, async (req, res) => {
 });
 
 router.get('/', authenticateJwt, async (req, res) => {
-  const events = await Event.find({}).populate({ path: 'programCoordinator', select: 'name' });
+  let events = [];
+  if (req.user.role === 'admin')
+    events = await Event.find({}).populate({ path: 'programCoordinator', select: 'name' });
+  else
+    events = await Event.find({ programCoordinator: req.user.id }).populate({ path: 'programCoordinator', select: 'name' })
   const dates = events.map((event) => (event.date));
   const yearWeekMap = dates.reduce((acc, dateStr) => {
     const date = dayjs(dateStr);

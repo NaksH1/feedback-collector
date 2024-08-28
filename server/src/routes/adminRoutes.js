@@ -3,7 +3,7 @@ const router = express.Router();
 const model = require('../model/dbModel');
 const Admin = model.Admin;
 const jwt = require('jsonwebtoken');
-const authenticateJwt = require('../middlewares/authentication.js');
+const authenticateJwt = require('../middlewares/authentication.js').authenticateJwt;
 
 
 const secret = 'S@cr$t';

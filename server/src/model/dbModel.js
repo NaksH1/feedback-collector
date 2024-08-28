@@ -12,14 +12,15 @@ const adminSchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
-  name: String
+  name: String,
+  role: { type: String, enums: ['admin', 'user'], default: 'user' }
 });
 
 const eventSchema = new mongoose.Schema({
   name: String,
   date: Date,
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
-  programCoordinator: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  programCoordinator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   volunteers: [{
     volunteerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Volunteer' },
     type: { type: String, enum: ['potential', 'training', 'programVolunteer'] }
@@ -33,7 +34,7 @@ const volunteerSchema = new mongoose.Schema({
   mobileNumber: String,
   gender: { type: String, enums: ['Male', 'Female'] },
   city: String,
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }]
 });
 
@@ -74,7 +75,7 @@ const feedbackSchema = new mongoose.Schema({
   potential: potentialSchema,
   training: trainingSchema,
   programVolunteer: programVolunteerSchema,
-  givenBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
+  givenBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   deleted_at: { type: Date, default: null }
 });
 
