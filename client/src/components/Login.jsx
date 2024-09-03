@@ -12,7 +12,7 @@ function Login() {
   const handleLogin = () => {
     axios({
       method: 'post',
-      url: `${import.meta.env.VITE_BACKEND_URL}/admin/login`,
+      url: `${import.meta.env.VITE_BACKEND_URL}/user/login`,
       headers: {
         "Content-Type": "application/json",
         username: email,

@@ -7,6 +7,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
+import CloseIcon from '@mui/icons-material/Close';
 
 function VolunteerDailog({ open, setOpen, volunteer, event }) {
   const navigate = useNavigate();
@@ -112,6 +113,14 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
             </Typography>
           ) : <>"Loading..."</>}
         </DialogTitle>
+        <IconButton aria-label='close'
+          onClick={handleClose}
+          sx={{
+            position: 'absolute', right: 8, top: 8, color: '#cc4521'
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
         <DialogContent sx={{ backgroundColor: '#f3f0e5' }}>
           {volunteer ? (
             <>
@@ -165,16 +174,16 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
               <> "Loading..."</>
             )}
         </DialogContent>
-        <DialogActions sx={{ backgroundColor: '#f3f0e5' }}>
-          <Button autoFocus onClick={handleClose}
-            sx={{
-              color: '#cc4521', fontWeight: 'bold', '&:hover': {
-                color: '#03346E'
-              }
-            }}>
-            Close
-          </Button>
-        </DialogActions>
+        {/* <DialogActions sx={{ backgroundColor: '#f3f0e5' }}> */}
+        {/*   <Button autoFocus onClick={handleClose} */}
+        {/*     sx={{ */}
+        {/*       color: '#cc4521', fontWeight: 'bold', '&:hover': { */}
+        {/*         color: '#03346E' */}
+        {/*       } */}
+        {/*     }}> */}
+        {/*     Close */}
+        {/*   </Button> */}
+        {/* </DialogActions> */}
       </Dialog >
       <Snackbar
         open={deleteOpen}

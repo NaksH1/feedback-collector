@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const model = require('../model/dbModel');
 const Volunteer = model.Volunteer;
-const authenticateJwt = require('../middlewares/authentication');
+const authenticateJwt = require('../middlewares/authentication').authenticateJwt;
 
 router.post('/', authenticateJwt, async (req, res) => {
   const mobileNumber = req.body.mobileNumber;

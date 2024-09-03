@@ -39,7 +39,7 @@ function UpdateCard({ event, setEvent }) {
     }
     axios({
       method: 'get',
-      url: `${import.meta.env.VITE_BACKEND_URL}/admin/`,
+      url: `${import.meta.env.VITE_BACKEND_URL}/user/`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }

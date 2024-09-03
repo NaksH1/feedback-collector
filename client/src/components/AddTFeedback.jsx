@@ -217,8 +217,15 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState }) 
           }
           <Grid item xs={12}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: '36vw', mx: "auto" }}>
-              <Button variant="contained" onClick={handleSubmit} sx={{ fontsize: '0.75rem' }}>{toUpdate ? 'Update' : 'Submit'}</Button>
-              <Button variant="text" sx={{ fontsize: '0.75rem' }}>Clear Form</Button>
+              <Button variant="contained" onClick={handleSubmit} sx={{
+                fontsize: '0.75rem',
+                color: '#fff', backgroundColor: '#ad4511',
+                fontWeight: 'bold',
+                '&:hover': {
+                  backgroundColor: '#0b055f'
+                }
+              }}>{toUpdate ? 'Update' : 'Submit'}</Button>
+              <Button variant="text" sx={{ fontsize: '0.75rem', color: '#ad4511' }} onClick={() => setFeedbackState({})}>Clear Form</Button>
             </Stack>
           </Grid>
         </Grid>

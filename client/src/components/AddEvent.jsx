@@ -35,7 +35,7 @@ function AddEvent({ open, setOpen, setEvents, handleClose, setEventAdded, filter
     })
     axios({
       method: 'get',
-      url: `${import.meta.env.VITE_BACKEND_URL}/admin/`,
+      url: `${import.meta.env.VITE_BACKEND_URL}/user/`,
       headers: {
         "Authorization": "Bearer " + localStorage.getItem("token")
       }

@@ -195,14 +195,14 @@ function AddVolunteer({ open, close, eventId, onSuccess }) {
                 onChange={(e) => {
                   setCity(e.target.value);
                 }}
-                sx={{ width: '13vw' }}
+                sx={{ width: { xs: '40vw', sm: '25vw', md: '15vw', lg: '13vw' } }}
                 value={city} autoFocus
                 margin="dense" id="outlined-basic"
                 label="City" variant="outlined" />
               <TextField key={gender}
                 autoFocus select id="outlined-basic" label="Gender" variant="outlined" value={gender}
                 onChange={(e) => { setGender(e.target.value); }}
-                sx={{ width: '13vw' }}
+                sx={{ width: { xs: '40vw', sm: '25vw', md: '15vw', lg: '13vw' } }}
               >
                 {volunteerGender.map((option) => {
                   return <MenuItem key={option.value} value={option.value}>

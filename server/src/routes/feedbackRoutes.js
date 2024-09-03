@@ -5,7 +5,7 @@ const Event = model.Event;
 const Volunteer = model.Volunteer;
 const Feedback = model.Feedback;
 const Questionnaire = model.Questionnaire;
-const authenticateJwt = require('../middlewares/authentication');
+const authenticateJwt = require('../middlewares/authentication').authenticateJwt;
 const { predefinedTrainingQuestions, predefinedProgramVolunteerQuestions, trainingQuestionsId, programVolunteerQuestionsId } = require('../model/initQuestions');
 
 router.post('/', authenticateJwt, async (req, res) => {

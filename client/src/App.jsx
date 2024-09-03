@@ -13,6 +13,8 @@ import ViewFeedback from './components/ViewFeedback.jsx';
 import AddTFeedback from './components/AddTFeedback.jsx';
 import SingleVolunteer from './components/SingleVolunteer.jsx';
 import VolunteersList from './components/VolunteersList.jsx';
+import ProtectedRoute from './ProtectedRoutes.jsx';
+
 
 function App() {
   const navigate = useNavigate();
@@ -32,8 +34,10 @@ function App() {
               <Route path="/addpvfeedback" element={<AddPVFeedback />} />
               <Route path="/viewfeedback/:feedbackId" element={<ViewFeedback />} />
               <Route path="/addtfeedback/" element={<AddTFeedback />} />
-              <Route path="/volunteerslist" element={<VolunteersList />} />
-              <Route path="/volunteerslist/:volunteerId" element={<SingleVolunteer />} />
+              <Route path="/volunteerslist" element={<ProtectedRoute element={VolunteersList} roles={['admin']} />} />
+              <Route path="/volunteerslist/:volunteerId" element={<ProtectedRoute element={SingleVolunteer} roles={['admin']} />} />
+              {/* <Route path="/volunteerslist" element={<VolunteersList />} /> */}
+              {/* <Route path="/volunteerslist/:volunteerId" element={<SingleVolunteer />} /> */}
             </Routes>
           </AuthProvider>
         </LocalizationProvider>

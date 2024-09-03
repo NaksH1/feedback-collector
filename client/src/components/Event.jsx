@@ -22,8 +22,8 @@ function Event() {
   const [selectedWeek, setSelectedWeek] = useState('');
   const eventsPerPage = 8;
   const fetchEvents = () => {
-    const apiUrl = import.meta.env.VITE_BACKEND_URL;
-    console.log(apiUrl);
+    // const apiUrl = import.meta.env.VITE_BACKEND_URL;
+    // console.log(apiUrl);
     axios({
       method: "get",
       url: `${import.meta.env.VITE_BACKEND_URL}/event`,
