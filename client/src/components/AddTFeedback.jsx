@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, Checkbox, Divider, FormControl, Radio, RadioGroup, FormControlLabel, FormGroup, FormLabel, Grid, Stack, TextField, Typography, Button, FormHelperText, Snackbar, Alert, Box } from "@mui/material";
+import { Card, CardContent, CardHeader, Checkbox, Divider, FormControl, Radio, RadioGroup, FormControlLabel, FormGroup, FormLabel, Grid, Stack, TextField, Typography, Button, FormHelperText, Snackbar, Alert, Box, CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -213,7 +213,9 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState }) 
               return null;
             })
             :
-            <span>Loading...</span>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh' }}>
+              <CircularProgress color="secondary" />
+            </Box>
           }
           <Grid item xs={12}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: '36vw', mx: "auto" }}>
