@@ -14,7 +14,7 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
   const [errorState, setErrorState] = useState({});
   const [errorFilling, setErrorFilling] = useState(false);
   const [updateInfo, setUpdateInfo] = useState({});
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     axios({
       method: 'get',
@@ -33,9 +33,12 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
         status: resp.data.feedback[type].status,
         recommendation: resp.data.feedback[type].recommendation
       }))
+      setLoading(false);
     });
-    if (viewFeedback && viewFeedbackState)
+    if (viewFeedback && viewFeedbackState) {
+      setLoading(false);
       setFeedbackState(viewFeedbackState);
+    }
   }, [type, volunteerId, event._id, viewFeedback, viewFeedbackState]);
 
   const formatDate = (date) => {
@@ -111,6 +114,7 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
 
   const handleSubmit = async () => {
     if (validateForm()) {
+      setLoading(true);
       const answers = [];
       for (const [index, [key, value]] of Object.entries(Object.entries(feedbackState))) {
         answers.push({
@@ -179,8 +183,8 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
         <Grid container spacing={1.5} xs={12} md={8} lg={6} direction="column" sx={{ marginTop: '2vh' }}>
           <Header volunteerName={volunteerName} eventName={event.name} eventDate={formatDate(event.date)}
             title="Program volunteer Observation form(pre-Org training)" />
-          {questionnaire ?
-            questionnaire.map((questionObj) => {
+          {!loading ?
+            questionnaire?.map((questionObj) => {
               if (questionObj.type === 'single-choice') {
                 return (
                   <SingleChoice
@@ -222,20 +226,22 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
               <CircularProgress color="secondary" />
             </Box>
           }
-          <Grid item xs={12}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: '36vw', mx: "auto" }}>
-              <Button variant="contained" onClick={handleSubmit} sx={{
-                fontsize: '0.75rem',
-                color: '#fff', backgroundColor: '#ad4511',
-                fontWeight: 'bold',
-                '&:hover': {
-                  backgroundColor: '#0b055f'
-                }
-              }}> {toUpdate ? 'Update' : 'Submit'}</Button>
+          {!loading &&
+            <Grid item xs={12}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: '36vw', mx: "auto" }}>
+                <Button variant="contained" onClick={handleSubmit} sx={{
+                  fontsize: '0.75rem',
+                  color: '#fff', backgroundColor: '#ad4511',
+                  fontWeight: 'bold',
+                  '&:hover': {
+                    backgroundColor: '#0b055f'
+                  }
+                }}> {toUpdate ? 'Update' : 'Submit'}</Button>
 
-              <Button variant="text" sx={{ fontsize: '0.75rem', color: '#ad4511' }} onClick={() => setFeedbackState({})}>Clear Form</Button>
-            </Stack>
-          </Grid>
+                <Button variant="text" sx={{ fontsize: '0.75rem', color: '#ad4511' }} onClick={() => setFeedbackState({})}>Clear Form</Button>
+              </Stack>
+            </Grid>
+          }
         </Grid>
         {toUpdate && (
           <Grid item xs={12} md={4} lg={5} sx={{ position: 'sticky', top: '7vh', alignSelf: 'flex-start' }}>

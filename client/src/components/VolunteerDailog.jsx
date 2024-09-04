@@ -58,6 +58,9 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
         url: `${import.meta.env.VITE_BACKEND_URL}/feedback/${feedbackId}`,
         headers: {
           "Authorization": "Bearer " + localStorage.getItem('token')
+        },
+        data: {
+          eventId: event._id
         }
       });
       console.log(resp.data);
@@ -80,6 +83,9 @@ function VolunteerDailog({ open, setOpen, volunteer, event }) {
         url: `${import.meta.env.VITE_BACKEND_URL}/feedback/recover/${deletedFeedbackId}`,
         headers: {
           "Authorization": "Bearer " + localStorage.getItem("token")
+        },
+        data: {
+          eventId: event._id
         }
       })
       const restored = await axios({
