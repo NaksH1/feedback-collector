@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import dayjs from "dayjs";
-import { Header, Question, UpdateQuestion } from "./AddTFeedback";
+import { Header, MultipleChoice, Question, UpdateQuestion } from "./AddTFeedback";
 
 function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState }) {
   const location = useLocation();
@@ -47,8 +47,18 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
     const { type, value } = e.target;
 
     setFeedbackState((prevState) => {
-      console.log(type, value);
-      if (type === 'radio') {
+      const { type, value, checked } = e.target;
+      if (type === 'checkbox') {
+        const currentSelectedValues = prevState[questionId]?.selectedOptions || [];
+        return {
+          ...prevState,
+          [questionId]: {
+            selectedOptions: checked ?
+              [...currentSelectedValues, value] :
+              currentSelectedValues.filter(val => val !== value)
+          }
+        };
+      } else if (type === 'radio') {
         return {
           ...prevState,
           [questionId]: {
@@ -142,7 +152,7 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
           });
           console.log('Feedback Updated');
           alert('Feedback Updated')
-          navigate(-1)
+          navigate(-1);
         }
       }
       catch (err) {
@@ -190,6 +200,17 @@ function AddPVFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState })
                     question={questionObj.question}
                     change={(e) => handleChange(e, questionObj._id)}
                     defaultVal={feedbackState[questionObj._id]?.answer || ''}
+                    error={errorState[questionObj._id]}
+                  />
+                );
+              } else if (questionObj.type === 'multiple-choice') {
+                return (
+                  <MultipleChoice
+                    key={questionObj._id}
+                    question={questionObj.question}
+                    options={questionObj.options}
+                    selectedOptions={feedbackState[questionObj._id]?.selectedOptions || []}
+                    change={(e) => handleChange(e, questionObj._id)}
                     error={errorState[questionObj._id]}
                   />
                 );

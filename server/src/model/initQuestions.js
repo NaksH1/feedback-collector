@@ -60,7 +60,7 @@ const predefinedTrainingQuestions = [
 
 const predefinedProgramVolunteerQuestions = [
   {
-    question: 'Area of activity', type: 'single-choice',
+    question: 'Area of activity', type: 'multiple-choice',
     options: [{ name: 'Dining' }, { name: 'Ushering' }, { name: 'Inside hall' },
     { name: 'Hall setup' }, { name: 'Food Shifting' }, { name: 'Audio' }, { name: 'Other' }]
   }
@@ -82,7 +82,7 @@ const predefinedProgramVolunteerQuestions = [
     { name: 'They can be trained' }, { name: 'They are not suitable for training' }, { name: 'Other' }]
   },
   {
-    question: 'If they can be trained which Area of activity do you think they will fit best?', type: 'single-choice',
+    question: 'If they can be trained which Area of activity do you think they will fit best?', type: 'multiple-choice',
     options: [{ name: 'Dining' }, { name: 'Ushering' }, { name: 'Inside hall' },
     { name: 'Hall setup' }, { name: 'Food Shifting' }, { name: 'Audio' }, { name: 'Other' }]
   },

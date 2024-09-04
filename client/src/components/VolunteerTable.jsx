@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Button, Container, Pagination, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Button, Container, IconButton, Pagination, Paper, Snackbar, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import axios from "axios";
 import VolunteerDailog from "./VolunteerDailog";
 import AddIcon from '@mui/icons-material/Add';
 import AddVolunteer from "./AddVolunteer";
 import Papa from "papaparse";
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 
 function VolunteerTable({ event }) {
@@ -14,6 +15,7 @@ function VolunteerTable({ event }) {
   const [addVolunteer, setAddVolunteer] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [eventId, setEventId] = useState('');
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const volunteersPerPage = 5;
   const volunteerType = [
     { value: 'potential', label: 'Potential Sahabhagi' },
@@ -132,15 +134,40 @@ function VolunteerTable({ event }) {
     }
   }
 
+  const removeVolunteer = async (volunteerId) => {
+    const resp = await axios({
+      method: 'delete',
+      url: `${import.meta.env.VITE_BACKEND_URL}/event/deleteVolunteer`,
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      },
+      data: {
+        volunteerId: volunteerId,
+        eventId: eventId
+      }
+    });
+    setVolunteers((preVolunteers) => {
+      return preVolunteers.filter(preVolunteer => preVolunteer.volunteerId._id !== volunteerId);
+    });
+    setDeleteOpen(true);
+  }
+
+  const handleDeleteClose = (event, reason) => {
+    if (reason === 'clickaway')
+      return;
+    setDeleteOpen(false);
+  }
   return (
     <>
-      <Container maxWidth='xl'>
+      <Container maxWidth='xl' sx={{ padding: { xs: 1, sm: 2 } }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="subtitle1"
-            sx={{ fontWeight: 'bold' }}
-          >Volunteer Table</Typography>
+            sx={{ fontWeight: 'bold', fontSize: { xs: '14px', sm: '16px', md: '18px' } }}
+          >
+            Volunteer Table
+          </Typography>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <Button variant="contained" component="label" sx={{ fontWeight: 'bold' }}>
+            <Button variant="contained" component="label" sx={{ fontWeight: 'bold', fontSize: { xs: '10px', sm: '12px' } }}>
               Import CSV
               <input type="file" accept=".csv" hidden onChange={handleCSVUpload} />
             </Button>
@@ -148,21 +175,25 @@ function VolunteerTable({ event }) {
               sx={{
                 color: '#fff', backgroundColor: '#ad4511',
                 fontWeight: 'bold',
+                fontSize: { xs: '10px', sm: '12px' },
                 '&:hover': {
                   backgroundColor: '#0b055f'
                 }
               }}
-            >Add</Button>
+            >
+              Add
+            </Button>
           </Stack>
         </Stack>
-        <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+        <TableContainer component={Paper} sx={{ marginTop: 2, overflowX: 'auto' }}>
           <Table aria-label="simple table" key={volunteers}>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '30%', color: '#fff' }}>Name</TableCell>
-                <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '30%', color: '#fff' }}>Type</TableCell>
-                <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '20%', color: '#fff' }}>Mobile Number</TableCell>
-                <TableCell align="right" sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '20%', color: '#fff' }}>Created By</TableCell>
+                <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', flexGrow: 1, color: '#fff' }}>Name</TableCell>
+                <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', flexGrow: 1, color: '#fff' }}>Type</TableCell>
+                <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', flexGrow: 1, color: '#fff' }}>Feedback</TableCell>
+                <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', flexGrow: 1, color: '#fff' }}>Mobile Number</TableCell>
+                <TableCell align="right" sx={{ backgroundColor: '#464038', fontWeight: 'bold', flexGrow: 1, color: '#fff' }}>Remove</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -174,9 +205,18 @@ function VolunteerTable({ event }) {
                   <TableCell component="th" scope="row">
                     {row.volunteerId.name}
                   </TableCell>
-                  <TableCell >{getVolunteerType(row.type)}</TableCell>
-                  <TableCell >{row.volunteerId.mobileNumber}</TableCell>
-                  <TableCell align="right">{row.volunteerId.createdBy.name}</TableCell>
+                  <TableCell>{getVolunteerType(row.type)}</TableCell>
+                  <TableCell>{row.feedbackExist ? 'Completed' : 'Pending'}</TableCell>
+                  <TableCell>{row.volunteerId.mobileNumber}</TableCell>
+                  <TableCell align="right">
+                    <IconButton sx={{ padding: '2px' }} onClick={(event) => {
+                      event.stopPropagation();
+                      removeVolunteer(row.volunteerId._id)
+                    }
+                    }>
+                      <DeleteOutlineIcon />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -194,6 +234,12 @@ function VolunteerTable({ event }) {
           <VolunteerDailog open={volunteerDailog} setOpen={closeVolunteerDailog} volunteer={selectedVolunteer} event={event} />
         )}
         <AddVolunteer open={addVolunteer} close={closeAddVolunteer} eventId={event._id} onSuccess={handleSuccessfulVolunteerAdd} />
+        <Snackbar
+          open={deleteOpen}
+          autoHideDuration={6000}
+          onClose={handleDeleteClose}
+          message='Volunteer removed'
+        />
       </Container>
     </>
   )

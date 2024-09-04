@@ -172,14 +172,35 @@ router.get('/getVolunteer/:eventId', authenticateJwt, async (req, res) => {
   const eventId = req.params.eventId;
   const event = await Event.findById(eventId).populate({
     path: 'volunteers.volunteerId',
-    populate: { path: 'createdBy', select: 'name' }
+    populate: [
+      { path: 'createdBy', select: 'name' },
+      { path: 'feedbacks' }
+    ]
   });
   if (event) {
-    res.json({ volunteers: event.volunteers })
+    const volunteersWithFeedbackExist = event.volunteers.map(volunteerEntry => {
+      const volunteer = volunteerEntry.volunteerId.toObject();
+      const feedbackExist = volunteer.feedbacks.some(feedback => String(feedback.eventId) === eventId);
+      return {
+        ...volunteerEntry.toObject(),
+        feedbackExist
+      }
+    })
+    res.json({ volunteers: volunteersWithFeedbackExist })
   }
   else {
     res.status(404).json({ message: "Event not found" });
   }
 });
 
+router.delete('/deleteVolunteer', authenticateJwt, async (req, res) => {
+  const { eventId, volunteerId } = req.body;
+  let event = await Event.findById(eventId);
+  if (event) {
+    event.volunteers = event.volunteers.filter(volunteer => volunteer.volunteerId.toString() !== volunteerId);
+    await event.save();
+    res.json({ message: 'Volunteer removed' });
+  } else
+    res.status(404).json({ message: 'Event not found' })
+})
 module.exports = router;

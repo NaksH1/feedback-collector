@@ -149,6 +149,7 @@ function AddTFeedback({ viewFeedback, otherInfo, toUpdate, viewFeedbackState }) 
           });
           console.log('Feedback Updated', resp.data);
           alert('Feedback Updated');
+          navigate(-1);
         }
       }
       catch (err) {
@@ -314,7 +315,7 @@ export function UpdateQuestion({ question, change, defaultVal }) {
   );
 }
 
-function MultipleChoice({ question, options, selectedOptions, change, error }) {
+export function MultipleChoice({ question, options, selectedOptions, change, error }) {
   return (
     <Grid item xs={12}>
       <Card sx={{ maxWidth: 550, mx: "auto" }}>
