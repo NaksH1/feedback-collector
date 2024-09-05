@@ -3,6 +3,7 @@ const router = express.Router();
 const model = require('../model/dbModel');
 const User = model.User;
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 const authenticateJwt = require('../middlewares/authentication.js').authenticateJwt;
 
 
@@ -30,6 +31,25 @@ router.post('/signup', async (req, res, next) => {
     next(error);
   }
 });
+
+router.post('/auth/google', async (req, res) => {
+  const client = new OAuth2Client(process.env.GOOGLE_AUTH_CLIENT_ID);
+  const token = req.body.token;
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_AUTH_CLIENT_ID
+    });
+    const payload = ticket.getPayload();
+    console.log('Verified Google User', payload);
+    res.status(200).json({ message: 'Token verified Successfully', user: payload });
+  } catch (error) {
+    console.error('Token verification error ', error);
+    res.status(401).json({ message: 'Invalid Token' })
+  }
+})
+
+
 
 router.post('/userSignup', async (req, res, next) => {
   try {

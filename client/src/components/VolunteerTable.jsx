@@ -160,7 +160,7 @@ function VolunteerTable({ event }) {
   return (
     <>
       <Container maxWidth='xl' sx={{ padding: { xs: 1, sm: 2 } }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ maxWidth: '90vw' }}>
           <Typography variant="subtitle1"
             sx={{ fontWeight: 'bold', fontSize: { xs: '14px', sm: '16px', md: '18px' } }}
           >
@@ -185,8 +185,8 @@ function VolunteerTable({ event }) {
             </Button>
           </Stack>
         </Stack>
-        <TableContainer component={Paper} sx={{ marginTop: 2, overflowX: 'auto' }}>
-          <Table aria-label="simple table" key={volunteers}>
+        <TableContainer component={Paper} sx={{ marginTop: 2, overflowX: 'auto', maxWidth: '90vw' }}>
+          <Table aria-label="simple table" sx={{ minWidth: 650 }} key={volunteers}>
             <TableHead>
               <TableRow>
                 <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', flexGrow: 1, color: '#fff' }}>Name</TableCell>

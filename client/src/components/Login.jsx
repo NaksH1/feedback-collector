@@ -1,8 +1,10 @@
-import { Card, TextField, Button, Stack, Typography, AppBar, CardHeader, CardContent, Box } from "@mui/material";
+import { Card, TextField, Button, Stack, Typography, AppBar, CardHeader, CardContent, Box, Divider } from "@mui/material";
 import { useState } from "react";
 import axios from 'axios';
 import App from "../App";
 import { useNavigate } from "react-router-dom";
+
+import GoogleSignInButton from "./GoogleSignInButton";
 
 function Login() {
   const navigate = useNavigate();
@@ -66,6 +68,8 @@ function Login() {
               }} onClick={handleLogin}>
                 LOGIN
               </Button>
+              <Divider>or</Divider>
+              <GoogleSignInButton />
             </Stack>
           </CardContent>
 
