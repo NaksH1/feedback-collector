@@ -39,13 +39,19 @@ function SingleVolunteer() {
   const viewFeedback = (feedbackId) => {
     navigate(`/viewfeedback/${feedbackId}`);
   }
-  const deleteFeedback = async (feedbackId) => {
+  const deleteFeedback = async (feedback) => {
     try {
+      const feedbackId = feedback._id;
+      const eventId = feedback.eventId._id;
       const resp = await axios({
         method: 'delete',
         url: `${import.meta.env.VITE_BACKEND_URL}/feedback/${feedbackId}`,
         headers: {
           "Authorization": "Bearer " + localStorage.getItem('token')
+        },
+        data: {
+          eventId: eventId,
+          volunteerId: feedback.volunteerId
         }
       });
       setFeedbacks(feedbacks.filter(feedback => (feedback._id !== feedbackId)));
@@ -151,7 +157,7 @@ function SingleVolunteer() {
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Delete">
-                          <IconButton onClick={() => deleteFeedback(row._id)}>
+                          <IconButton onClick={() => deleteFeedback(row)}>
                             <DeleteOutlineIcon />
                           </IconButton>
                         </Tooltip>

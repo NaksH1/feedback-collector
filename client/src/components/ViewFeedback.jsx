@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Question } from "./AddFeedback";
 import AddPVFeedback from "./AddPVFeedback";
 import dayjs from "dayjs";
-import { Alert, Button, Card, CardContent, CardHeader, Divider, Grid, Snackbar, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, CardHeader, CircularProgress, Divider, Grid, Snackbar, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 import AddTFeedback, { Header } from "./AddTFeedback";
 
@@ -115,7 +115,9 @@ function ViewFeedback() {
       {/*   </> */}
       {/* )} */}
       {loading ?
-        <span>Loading...</span> :
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh' }}>
+          <CircularProgress color="secondary" />
+        </Box> :
         <>
           {feedback?.type === 'training' ? getTrainingFeedback() : feedback?.type === 'programVolunteer' ? getProgramVolunteerFeedback() :
             <></>}

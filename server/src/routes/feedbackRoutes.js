@@ -83,21 +83,24 @@ router.delete('/:feedbackId', authenticateJwt, async (req, res) => {
   else {
     const event = await Event.findById(eventId);
     const volunteer = await Volunteer.findById(feedback.volunteerId);
-    event.volunteers = event.volunteers.filter(volunteer => String(volunteer.volunteerId) !== String(feedback.volunteerId));
-    volunteer.feedbacks = volunteer.feedbacks.filter(feedback => String(feedback) !== String(feedback._id));
-    await event.save();
-    await volunteer.save();
-    await feedback.softDelete();
-    res.status(200).json({ message: 'Feedback deleted', feedback: feedback });
+    if (event && volunteer) {
+      event.volunteers = event.volunteers.filter(volunteer => String(volunteer.volunteerId) !== String(feedback.volunteerId));
+      volunteer.feedbacks = volunteer.feedbacks.filter(feedback => String(feedback) !== String(feedback._id));
+      await event.save();
+      await volunteer.save();
+      await feedback.softDelete();
+      res.status(200).json({ message: 'Feedback deleted', feedback: feedback });
+    }
+    else
+      res.status(404).json({ message: 'Details not found' })
   }
 })
 
 router.put('/recover/:feedbackId', authenticateJwt, async (req, res) => {
   const feedbackId = req.params.feedbackId;
-  const eventId = req.body.eventId;
   const feedback = await Feedback.findById(feedbackId);
   await feedback.restore();
-  const event = await Event.findById(eventId);
+  const event = await Event.findById(feedback.eventId);
   const volunteer = await Volunteer.findById(feedback.volunteerId);
   event.volunteers.push({
     volunteerId: volunteer._id,
