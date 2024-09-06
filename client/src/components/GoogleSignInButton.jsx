@@ -1,4 +1,7 @@
+import { Box } from "@mui/material";
 import { GoogleLogin } from "@react-oauth/google";
+import axios from "axios";
+import { useEffect } from "react";
 
 function GoogleSignInButton() {
 
@@ -13,6 +16,8 @@ function GoogleSignInButton() {
         }
       });
       console.log('Backend response ', resp.data);
+      localStorage.setItem('token', resp.data.token);
+      window.location = "/events";
     } catch (error) {
       console.error('Error during token verification ', error);
     }
@@ -21,11 +26,20 @@ function GoogleSignInButton() {
   const handleGoogleLoginError = () => {
     console.log('Google Login Failed');
   }
+  useEffect(() => {
+    const googleButtonIframe = document.querySelector('iframe[title="Sign in with Google Button"]');
+    if (googleButtonIframe) {
+      googleButtonIframe.style.width = 380;
+    }
+  }, []);
   return (
-    <GoogleLogin
-      onSuccess={handleGoogleLoginSuccess}
-      onError={handleGoogleLoginError}
-    />
+    <Box sx={{ width: '100%', maxWidth: 380, margin: '0 auto' }}>
+      <GoogleLogin
+        onSuccess={handleGoogleLoginSuccess}
+        onError={handleGoogleLoginError}
+        width='350'
+      />
+    </Box>
   )
 }
 

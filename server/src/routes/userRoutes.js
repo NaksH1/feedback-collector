@@ -33,8 +33,10 @@ router.post('/signup', async (req, res, next) => {
 });
 
 router.post('/auth/google', async (req, res) => {
+  console.log('called')
   const client = new OAuth2Client(process.env.GOOGLE_AUTH_CLIENT_ID);
   const token = req.body.token;
+
   try {
     const ticket = await client.verifyIdToken({
       idToken: token,
@@ -42,7 +44,13 @@ router.post('/auth/google', async (req, res) => {
     });
     const payload = ticket.getPayload();
     console.log('Verified Google User', payload);
-    res.status(200).json({ message: 'Token verified Successfully', user: payload });
+    const email = payload.email;
+    const user = await User.findOne({ username: email });
+    if (user) {
+      const jwtToken = jwt.sign({ id: user._id, name: user.name, role: user.role }, secret, { expiresIn: '1hr' });
+      res.status(200).json({ message: 'Login successful', token: jwtToken });
+    } else
+      res.status(403).json({ message: 'Wrong credentials' });
   } catch (error) {
     console.error('Token verification error ', error);
     res.status(401).json({ message: 'Invalid Token' })

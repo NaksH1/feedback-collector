@@ -10,9 +10,7 @@ function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-
   const handleLogin = () => {
-    console.log(import.meta.env.VITE_BACKEND_URL);
     axios({
       method: 'post',
       url: `${import.meta.env.VITE_BACKEND_URL}/user/login`,
