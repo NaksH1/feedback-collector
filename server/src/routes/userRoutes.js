@@ -50,7 +50,7 @@ router.post('/auth/google', async (req, res) => {
       const jwtToken = jwt.sign({ id: user._id, name: user.name, role: user.role }, secret, { expiresIn: '1hr' });
       res.status(200).json({ message: 'Login successful', token: jwtToken });
     } else
-      res.status(403).json({ message: 'Wrong credentials' });
+      res.status(404).json({ message: 'User not found' });
   } catch (error) {
     console.error('Token verification error ', error);
     res.status(401).json({ message: 'Invalid Token' })

@@ -1,4 +1,4 @@
-import { Card, TextField, Button, Stack, Typography, AppBar, CardHeader, CardContent, Box, Divider } from "@mui/material";
+import { Card, TextField, Button, Stack, Typography, AppBar, CardHeader, CardContent, Box, Divider, Snackbar, Alert } from "@mui/material";
 import { useState } from "react";
 import axios from 'axios';
 import App from "../App";
@@ -10,6 +10,7 @@ function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const handleLogin = () => {
     axios({
       method: 'post',
@@ -23,7 +24,15 @@ function Login() {
       console.log(response);
       localStorage.setItem("token", response.data.token);
       window.location = "/events";
-    });
+    }).catch((error) => {
+      if (error.response && error.response.status === 403)
+        setSnackbarOpen(true);
+    })
+  }
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway')
+      return;
+    setSnackbarOpen(false);
   }
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '28vh', position: 'relative' }}>
@@ -67,12 +76,21 @@ function Login() {
                 LOGIN
               </Button>
               <Divider>or</Divider>
-              <GoogleSignInButton />
+              <GoogleSignInButton setSnackbarOpen={setSnackbarOpen} />
             </Stack>
           </CardContent>
 
         </Card>
       </Stack>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: '100%' }}>
+          Wrong Credentials
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }

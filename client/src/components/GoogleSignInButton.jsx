@@ -3,7 +3,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useEffect } from "react";
 
-function GoogleSignInButton() {
+function GoogleSignInButton({ setSnackbarOpen }) {
 
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     const token = credentialResponse.credential;
@@ -19,6 +19,9 @@ function GoogleSignInButton() {
       localStorage.setItem('token', resp.data.token);
       window.location = "/events";
     } catch (error) {
+      const message = error.response.data.message;
+      if (message === 'User not found')
+        setSnackbarOpen(true);
       console.error('Error during token verification ', error);
     }
 
