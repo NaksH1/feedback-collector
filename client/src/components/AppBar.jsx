@@ -10,9 +10,11 @@ import LogoutIcon from '@mui/icons-material/Logout';
 function Appbar() {
   const navigate = useNavigate();
   const [userName, setUserName] = useState(null);
-  const { isAuthenticated, setIsAuthenticated, role } = useAuth();
+  let { isAuthenticated, setIsAuthenticated, role } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const isMobile = useMediaQuery('(max-width:600px)');
+  if (!role)
+    role = localStorage.getItem('role')
   useEffect(() => {
     if (isAuthenticated) {
       const token = localStorage.getItem('token');

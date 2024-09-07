@@ -7,7 +7,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [role, setRole] = useState('user');
+  const [role, setRole] = useState();
   const navigate = useNavigate();
   const publicRoutes = ['/admin/login', '/admin/signup'];
   useEffect(() => {
@@ -16,12 +16,16 @@ export const AuthProvider = ({ children }) => {
     if (!(publicRoutes.includes(currentPath))) {
       if (isTokenExpired(token)) {
         setIsAuthenticated(false);
+        localStorage.removeItem('role')
         navigate("/admin/login");
       }
       else {
         setIsAuthenticated(true);
-        const { name, role } = jwtDecode(token);
-        setRole(role);
+        if (!localStorage.getItem('role')) {
+          const { role } = jwtDecode(token);
+          setRole(role);
+          localStorage.setItem('role', role);
+        }
       }
     }
   }, [navigate]);

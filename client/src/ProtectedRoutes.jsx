@@ -2,7 +2,9 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "./api/AuthContext";
 
 function ProtectedRoute({ element: Element, roles }) {
-  const { role } = useAuth();
+  let { role } = useAuth();
+  if (!role)
+    role = localStorage.getItem('role')
 
   if (!role) {
     return <Navigate to="/admin/login" replace />;

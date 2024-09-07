@@ -68,6 +68,45 @@ router.get('/getList', async (req, res) => {
   res.json({ training: training, programVolunteer: programVolunteer, potential: potential, volunteers: volunteerList });
 })
 
+const optionsAreaCoordinated = ['Hall set-up', 'Ushering', 'Dining', 'Foodshifting', 'Inside Hall', 'Other'];
+
+// options: [
+//       { name: 'Hall set-up' }, { name: 'Ushering' }, { name: 'Dining' }, { name: 'Foodshifting' }, { name: 'Inside Hall' },
+//       { name: 'Full Co-support to Ishanga organiser' }, { name: 'Coordinator for hall' },
+//       { name: 'Others' }]
+//
+// options: [{ name: 'Dining' }, { name: 'Ushering' }, { name: 'Inside hall' },
+//     { name: 'Hall setup' }, { name: 'Food Shifting' }, { name: 'Audio' }, { name: 'Other' }]
+
+function getPerProgramDetails(feedbacks) {
+  const programCounter = {};
+  for (const feedback of feedbacks) {
+    const eventName = feedback.eventId.name;
+    let selectedOption = [];
+    let questionName = '';
+    if (feedback.type === 'training')
+      questionName = 'Which area were they co-ordinating?';
+    else if (feedback.type === 'programVolunteer')
+      questionName = 'Area of activity';
+    const targetQuestion = feedback[feedback.type].questionnaire.find(q => q.question === questionName);
+    if (targetQuestion) {
+      selectedOption = targetQuestion.options.filter(option => option.selected === true);
+      selectedOption = selectedOption.map(option => (option.name));
+      if (!programCounter[eventName]) {
+        programCounter[eventName] = {};
+      }
+      selectedOption.forEach(option => {
+        if (programCounter[eventName][option])
+          programCounter[eventName][option] += 1;
+        else
+          programCounter[eventName][option] = 1;
+      });
+    }
+  }
+  return programCounter;
+}
+
+
 router.get('/volunteerfulldetails/:volunteerId', authenticateJwt, async (req, res) => {
   const volunteerId = req.params.volunteerId;
   const volunteer = await Volunteer.findById(volunteerId).populate({
@@ -90,8 +129,12 @@ router.get('/volunteerfulldetails/:volunteerId', authenticateJwt, async (req, re
     else
       programCounter[eventName] = 1;
   }
+  const perProgramDetails = getPerProgramDetails(volunteer.feedbacks);
   const totalProgram = volunteer.feedbacks.length;
-  res.status(200).json({ volunteer: volunteer, programCounter: programCounter, totalProgram: totalProgram });
+  res.status(200).json({
+    volunteer: volunteer, programCounter: programCounter, totalProgram: totalProgram,
+    perProgramDetails: perProgramDetails
+  });
 })
 
 router.put('/:volunteerId', authenticateJwt, async (req, res) => {

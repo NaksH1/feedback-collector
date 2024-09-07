@@ -1,20 +1,23 @@
-import { Box, Button, Card, CardContent, Container, Grid, IconButton, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Container, Grid, IconButton, Paper, Snackbar, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import dayjs from "dayjs";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
 
 function SingleVolunteer() {
   const { volunteerId } = useParams();
   const [volunteer, setVolunteer] = useState({});
   const [programCounter, setProgramCounter] = useState({});
+  const [perProgramDetails, setPerProgramDetails] = useState({});
   const [totalProgram, setTotalProgram] = useState(0);
   const [feedbacks, setFeedbacks] = useState([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletedFeedbackId, setDeletedFeedbackId] = useState();
   const navigate = useNavigate();
+  const [programName, setProgramName] = useState([]);
   useEffect(() => {
     axios({
       method: 'get',
@@ -23,11 +26,16 @@ function SingleVolunteer() {
         'Authorization': 'Bearer ' + localStorage.getItem('token')
       }
     }).then((resp) => {
-      console.log(resp.data);
+      console.log(resp.data.perProgramDetails);
       setVolunteer(resp.data.volunteer);
       setProgramCounter(resp.data.programCounter);
+      setPerProgramDetails(resp.data.perProgramDetails)
       setTotalProgram(resp.data.totalProgram);
       setFeedbacks(resp.data.volunteer.feedbacks);
+      const programKeys = Object.keys(resp.data.perProgramDetails);
+      setProgramName(programKeys);
+      if (Object.keys(programKeys).length > 0)
+        setValue(programKeys[0])
     })
   }, [])
 
@@ -89,16 +97,22 @@ function SingleVolunteer() {
       console.log(err);
     }
   }
+  const [value, setValue] = useState('1');
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
   return (
     <>
       <Container maxWidth="lg">
-        <Grid container spacing={1.5} alignItems="center" sx={{ marginTop: '9vh' }}>
-          <Grid item lg={4}>
+        <Grid container spacing={1.5} alignItems="flex-start" sx={{ marginTop: '9vh' }}>
+          <Grid item lg={4} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Card sx={{
               margin: 0,
               borderRadius: "12px",
               textAlign: "left",
-              boxShadow: "0 2px 4px -2px rgba(0,0,0,0.24), 0 4px 24px -2px rgba(0, 0, 0, 0.2)"
+              boxShadow: "0 2px 4px -2px rgba(0,0,0,0.24), 0 4px 24px -2px rgba(0, 0, 0, 0.2)",
+              hieght: '100%'
             }}>
               <CardContent sx={{ padding: 0 }}>
                 <Box sx={{
@@ -119,13 +133,57 @@ function SingleVolunteer() {
                   <Typography variant="body1" color="#000">
                     Mobile Number: {volunteer.mobileNumber}
                     <br />
+                    City: {volunteer.city ? volunteer.city : ''}
+                    <br />
+                    Gender: {volunteer.gender}
+                    <br />
                     Total Programs Completed: {totalProgram}
                   </Typography>
                 </Box>
               </CardContent>
             </Card>
           </Grid>
-
+          <Grid item lg={8} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <Card sx={{
+              margin: 0,
+              borderRadius: "12px",
+              textAlign: "left",
+              boxShadow: "0 2px 4px -2px rgba(0,0,0,0.24), 0 4px 24px -2px rgba(0, 0, 0, 0.2)",
+              height: '100%', display: 'flex', flexDirection: 'column'
+            }}>
+              <TabContext value={value}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  <TabList onChange={handleChange} aria-label="program tabs">
+                    {programName?.map((program) => (
+                      <Tab key={program} label={program} value={program} />
+                    ))}
+                  </TabList>
+                </Box>
+                {programName?.map((program) => (
+                  <TabPanel key={program} value={program} sx={{ padding: 0, flexGrow: 1 }}>
+                    <Box sx={{ height: '100%', overflowY: 'auto' }}>
+                      <Table stickyHeader>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Area</TableCell>
+                            <TableCell>Count</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {Object.entries(perProgramDetails[program]).map(([key, value], index) => (
+                            <TableRow key={index}>
+                              <TableCell>{key}</TableCell>
+                              <TableCell>{value}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </Box>
+                  </TabPanel>
+                ))}
+              </TabContext>
+            </Card>
+          </Grid>
           <Grid item lg={12}>
             <TableContainer component={Paper} sx={{ marginTop: '5vh' }}>
               <Table>
