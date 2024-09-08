@@ -1,11 +1,11 @@
-import { Box, Button, Card, CardContent, Container, Grid, IconButton, Paper, Snackbar, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Container, Grid, IconButton, Paper, Snackbar, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Tooltip, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import dayjs from "dayjs";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
+
 
 function SingleVolunteer() {
   const { volunteerId } = useParams();
@@ -151,27 +151,41 @@ function SingleVolunteer() {
               boxShadow: "0 2px 4px -2px rgba(0,0,0,0.24), 0 4px 24px -2px rgba(0, 0, 0, 0.2)",
               height: '100%', display: 'flex', flexDirection: 'column'
             }}>
-              <TabContext value={value}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                  <TabList onChange={handleChange} aria-label="program tabs">
-                    {programName?.map((program) => (
-                      <Tab key={program} label={program} value={program} />
-                    ))}
-                  </TabList>
-                </Box>
-                {programName?.map((program) => (
-                  <TabPanel key={program} value={program} sx={{ padding: 0, flexGrow: 1 }}>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider', backgroundColor: '#464038', color: '#fff' }}>
+                <Tabs
+                  value={value}
+                  onChange={handleChange}
+                  aria-label="program tabs"
+                  variant="scrollable"
+                  sx={{
+                    '& .MuiTab-root': { color: '#fff' }, // Set tab text color
+                    '& .Mui-selected': { color: '#fff', fontWeight: 'bold' }
+                  }}
+                >
+                  {programName?.map((program, index) => (
+                    <Tab key={program} label={program} value={index} />
+                  ))}
+                </Tabs>
+              </Box>
+
+              {programName?.map((program, index) => (
+                value === index && (
+                  <Box key={program} sx={{ padding: 0, flexGrow: 1, overflowY: 'auto' }}>
                     <Box sx={{ height: '100%', overflowY: 'auto' }}>
                       <Table stickyHeader>
                         <TableHead>
                           <TableRow>
-                            <TableCell>Area</TableCell>
-                            <TableCell>Count</TableCell>
+                            <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '30%', color: '#fff' }}>
+                              Area
+                            </TableCell>
+                            <TableCell sx={{ backgroundColor: '#464038', fontWeight: 'bold', width: '30%', color: '#fff' }}>
+                              Count
+                            </TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {Object.entries(perProgramDetails[program]).map(([key, value], index) => (
-                            <TableRow key={index}>
+                          {Object.entries(perProgramDetails[program]).map(([key, value], idx) => (
+                            <TableRow key={idx}>
                               <TableCell>{key}</TableCell>
                               <TableCell>{value}</TableCell>
                             </TableRow>
@@ -179,9 +193,9 @@ function SingleVolunteer() {
                         </TableBody>
                       </Table>
                     </Box>
-                  </TabPanel>
-                ))}
-              </TabContext>
+                  </Box>
+                )
+              ))}
             </Card>
           </Grid>
           <Grid item lg={12}>
